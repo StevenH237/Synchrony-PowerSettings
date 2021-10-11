@@ -1,0 +1,15 @@
+{
+	"name": "PowerSettings",
+	"displayName": "Power Settings",
+	"version": "1.0.0",
+	"synchronyVersion": "0.43",
+	"description": "No description given.",
+	"author": "Nixill",
+	"dependencies": {},
+	"api": {
+		"scriptPath": "scripts"
+	},
+	"icon": "PowerSettingsIcon.png",
+	"banner": "PowerSettingsBanner.png",
+	"tags": []
+}
