@@ -5,7 +5,9 @@
 	"synchronyVersion": "0.43",
 	"description": "No description given.",
 	"author": "Nixill",
-	"dependencies": {},
+	"dependencies": {
+		"NixLib": "1.2.0"
+	},
 	"api": {
 		"scriptPath": "scripts"
 	},
