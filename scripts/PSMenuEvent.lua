@@ -5,6 +5,7 @@ local SettingsStorage = require "necro.config.SettingsStorage"
 
 local PSBitflag = require "PowerSettings.types.Bitflag"
 local PSEntity  = require "PowerSettings.types.Entity"
+local PSNumber  = require "PowerSettings.types.Number"
 local PSStorage = require "PowerSettings.PSStorage"
 
 Event.menu.override("settings", 1, function(func, ev)
@@ -35,6 +36,20 @@ Event.menu.override("settings", 1, function(func, ev)
         v.action = function() PSEntity.action(v.id) end
         v.leftAction = function() PSEntity.leftAction(v.id) end
         v.rightAction = function() PSEntity.rightAction(v.id) end
+
+      -- Numeric setting types with greaterThan/lessThan parameters
+      elseif node.sType == "number" or node.sType == "time" or node.sType == "percent" then
+        if data.lowerBound or data.upperBound then
+          local cAction = v.action
+          local cLeftAction = v.leftAction
+          local cRightAction = v.rightAction
+          local cSpecialAction = v.specialAction
+
+          v.action = function() cAction() PSNumber.validateBounds(v.id) end
+          v.leftAction = function() cLeftAction() PSNumber.validateBounds(v.id) end
+          v.rightAction = function() cRightAction() PSNumber.validateBounds(v.id) end
+          v.specialAction = function() cSpecialAction() PSNumber.validateBounds(v.id) end
+        end
       end
 
       -- Code for basic settings

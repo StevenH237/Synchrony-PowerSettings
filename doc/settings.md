@@ -2,19 +2,24 @@ Power Settings supports settings in the `shared` and `entitySchema` modes only. 
 
 But the main draw of Power Settings is its expanded settings types and options.
 
-Power Settings has the following additional global setting options:
+# Extra setting options
 
-* `basicName` (string): A name to be displayed when basic settings are enabled.
+## Global options
+* **`basicName`**: `string` - The name used on an option when basic settings are enabled.
 
-And the following additional settings types:
+## `number` options
+(these also apply to `percent` and `time`)
 
-* [`bitflag`](#bitflag): A bitflag setting lets the player set the individual bits of an integer when using advanced options.
-* [`entity`](#entity): An entity setting lets the player select a single entity from a limited subset.
+* **`lowerBound`**: `string` or `function` - The lowest this value should go.
+* **`upperBound`**: `string` or `function` - The highest this value should go.
 
-# Notes
-Some settings are labeled **requires global**. These settings only work when `PowerSettings.setGlobal` has been used.
+If `lowerBound` or `upperBound` are strings, they are treated as setting ID nodes, and their value is the value of the referenced setting at the time you try to change this one. If they don't start with `mod.`, then they'll be prefixed with `mod.CurrentModName.` (then just enter the same as `id`).
 
-# `bitflag`
+If they're functions, they're called with no parameters, and the return value should be numeric.
+
+# Extra setting types
+
+## `bitflag`
 The bitflag setting lets the player set the individual bits of an integer when using advanced options.
 
 The setting's base type is `number`. 
@@ -30,7 +35,7 @@ It takes the following options, in addition to global options:
 
 ¹ Either `flags` or `presets` is required.
 
-# `entity`
+## `entity`
 The entity setting lets the player select an entity from a limited subset of entities.
 
 The setting's base type is `text`. The text returned is the selected entity's `name`.

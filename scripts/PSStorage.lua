@@ -1,11 +1,11 @@
+local PSMain = require "PowerSettings.PSMain"
+
 local module = {}
 
 local storedSettings = {}
 
 function module.add(sType, data)
-  local modName = script.loader
-  modName = modName:sub(1, modName:find(".", 1, true) - 1)
-  storedSettings["mod." .. modName .. "." .. data.id] = {sType=sType, data=data}
+  storedSettings["mod." .. PSMain.getCallingMod() .. "." .. data.id] = {sType=sType, data=data}
 end
 
 function module.contains(id)
