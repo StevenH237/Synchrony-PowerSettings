@@ -25,7 +25,7 @@ local function labelBit(node, name, ind)
   return out
 end
 
-Event.menu.add("PowerSettingsMenuBitflag", "PowerSettingsMenuBitflag", function(ev)
+Event.menu.add("menuBitflag", "PowerSettings_bitflag", function(ev)
   ev.menu = {}
   local entries = {}
   local advanced = SettingsStorage.get("config.showAdvanced")
@@ -44,13 +44,14 @@ Event.menu.add("PowerSettingsMenuBitflag", "PowerSettingsMenuBitflag", function(
       hex = hex:sub(hex:find("[123456789abcdef]", 1, false), -1)
       k = k .. " (0x" .. hex .. ")"
     end
-    local entry = {}
     local action = function() flipBit(ev.arg, v) end
-    entry.leftAction = action
-    entry.rightAction = action
-    entry.action = action
-    entry.label = function() return labelBit(ev.arg, k, v) end
-    entry.id = ev.arg .. ".bit" .. v
+    local entry = {
+      id = ev.arg .. ".bit" .. v,
+      leftAction = action,
+      rightAction = action,
+      action = action,
+      label = function() return labelBit(ev.arg, k, v) end
+    }
     table.insert(entries, entry)
     ::nextBit::
   end

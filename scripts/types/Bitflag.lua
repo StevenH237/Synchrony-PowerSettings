@@ -72,7 +72,11 @@ function module.nameFlags(flags)
 end
 
 function module.setting(mode, args)
+  if args.presets == nil and args.flags == nil then
+    error("Bitflag settings must specify flags or presets (preferably both).", 2)
+  end
   args.editAsString = false -- forcibly false for bitflag settings, we'll edit as menu instead
+  args.presets = args.presets or args.flags
   args.format = args.format or function(val) return module.format(val, args.presets) end
   args.flags = module.nameFlags(args.flags or module.getFlags(args.presets))
   PSStorage.add("bitflag", args)
@@ -81,7 +85,7 @@ end
 
 function module.action(id)
   -- Opens the bitflag selectors
-  Menu.open("PowerSettingsMenuBitflag", id)
+  Menu.open("PowerSettings_bitflag", id)
 end
 
 function module.leftAction(id)

@@ -4,6 +4,7 @@ local Settings        = require "necro.config.Settings"
 local SettingsStorage = require "necro.config.SettingsStorage"
 
 local PSBitflag = require "PowerSettings.types.Bitflag"
+local PSEntity  = require "PowerSettings.types.Entity"
 local PSStorage = require "PowerSettings.PSStorage"
 
 Event.menu.override("settings", 1, function(func, ev)
@@ -19,9 +20,21 @@ Event.menu.override("settings", 1, function(func, ev)
 
       -- Setting type "bitflag"
       if node.sType == "bitflag" then
-        v.action = function() PSBitflag.action(v.id) end
+        v.action = function()
+          if SettingsStorage.get("config.showAdvanced") then
+            PSBitflag.action(v.id)
+          else
+            PSBitflag.rightAction(v.id)
+          end
+        end
         v.leftAction = function() PSBitflag.leftAction(v.id) end
         v.rightAction = function() PSBitflag.rightAction(v.id) end
+
+      -- Setting type "entity"
+      elseif node.sType == "entity" then
+        v.action = function() PSEntity.action(v.id) end
+        v.leftAction = function() PSEntity.leftAction(v.id) end
+        v.rightAction = function() PSEntity.rightAction(v.id) end
       end
 
       -- Code for basic settings
