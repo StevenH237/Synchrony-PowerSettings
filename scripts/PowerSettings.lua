@@ -17,7 +17,7 @@ end
 
 for _, v in ipairs({"shared", "entitySchema"}) do
   module[v] = {}
-  for _, t in ipairs({"enum", "string", "table", "choice", "action"}) do
+  for _, t in ipairs({"bool", "enum", "string", "table", "choice", "action"}) do
     module[v][t] = function(args) return defaultSetting(v, t, args) end
   end
 

@@ -62,7 +62,7 @@ end
 function module.leftAction(id)
   local node = PSStorage.get(id)
   local list = node.data.entities
-  local value = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.get(id)
+  local value = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.getDefaultValue(id)
   local leftValue = nil
 
   for i, v in ipairs(list) do
@@ -81,7 +81,7 @@ end
 function module.rightAction(id)
   local node = PSStorage.get(id)
   local list = node.data.entities
-  local value = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.get(id)
+  local value = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.getDefaultValue(id)
   local useNext = nil
 
   for i, v in ipairs(list) do

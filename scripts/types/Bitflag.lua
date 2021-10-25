@@ -92,7 +92,7 @@ function module.leftAction(id)
   -- Sets the setting to the highest preset lower than its current value, or the highest preset altogether if no lower preset exists.
   local node = PSStorage.get(id, Settings.Layer.REMOTE_PENDING)
   local presets = node.data.presets
-  local A = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.get(id)
+  local A = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.getDefaultValue(id)
   local B = nil
 
   for k, C in pairs(presets) do
@@ -110,7 +110,7 @@ function module.rightAction(id)
   -- Sets the setting to the lowest preset higher than its current value, or the lowest preset altogether if no higher preset exists.
   local node = PSStorage.get(id, Settings.Layer.REMOTE_PENDING)
   local presets = node.data.presets
-  local A = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.get(id)
+  local A = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.getDefaultValue(id)
   local B = nil
 
   for k, C in pairs(presets) do

@@ -8,13 +8,13 @@ local EnumUtils = require "PowerSettings.EnumUtils"
 local PSStorage = require "PowerSettings.PSStorage"
 
 local function flipBit(node, ind)
-  local value = SettingsStorage.get(node, Settings.Layer.REMOTE_PENDING) or SettingsStorage.get(node)
+  local value = SettingsStorage.get(node, Settings.Layer.REMOTE_PENDING) or SettingsStorage.getDefaultValue(node)
   SettingsStorage.set(node, bit.bxor(value, ind), Settings.Layer.REMOTE_PENDING)
 end
 
 local function labelBit(node, name, ind)
   local out = name .. ": "
-  local value = SettingsStorage.get(node, Settings.Layer.REMOTE_PENDING) or SettingsStorage.get(node)
+  local value = SettingsStorage.get(node, Settings.Layer.REMOTE_PENDING) or SettingsStorage.getDefaultValue(node)
 
   if bit.band(value, ind) ~= 0 then
     out = out .. "\3*9e9On\3r"

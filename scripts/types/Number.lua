@@ -8,7 +8,7 @@ local module = {}
 
 function module.validateBounds(id)
   local this = PSStorage.get(id)
-  local value = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.get(id)
+  local value = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.getDefaultValue(id)
   local newValue = nil
   local lowerBound = this.data.lowerBound
   local lowerValue = nil
@@ -18,7 +18,7 @@ function module.validateBounds(id)
   -- Let's validate the lower bound first
   if type(lowerBound) == "string" then
     -- Strings are treated as a setting ID.
-    lowerValue = SettingsStorage.get(lowerBound, Settings.Layer.REMOTE_PENDING) or SettingsStorage.get(lowerBound)
+    lowerValue = SettingsStorage.get(lowerBound, Settings.Layer.REMOTE_PENDING) or SettingsStorage.getDefaultValue(lowerBound)
   elseif type(lowerBound) == "function" then
     -- Functions are called parameterlessly.
     lowerValue = lowerBound()
@@ -32,7 +32,7 @@ function module.validateBounds(id)
   -- Let's validate the upper bound second
   if type(upperBound) == "string" then
     -- Strings are treated as a setting ID.
-    upperValue = SettingsStorage.get(upperBound, Settings.Layer.REMOTE_PENDING) or SettingsStorage.get(upperBound)
+    upperValue = SettingsStorage.get(upperBound, Settings.Layer.REMOTE_PENDING) or SettingsStorage.getDefaultValue(upperBound)
   elseif type(upperBound) == "function" then
     -- Functions are called parameterlessly.
     upperValue = upperBound()
