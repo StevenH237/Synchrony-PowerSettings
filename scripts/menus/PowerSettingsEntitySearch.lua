@@ -22,12 +22,9 @@ local function searchKeystroke(arg, key)
   Menu.update()
 end
 
-local function searchToggle(arg, active, confirm)
-end
-
-local function resultAction(id, value)
+local function resultAction(value, callback)
   Menu.close()
-  SettingsStorage.set(id, value, Settings.Layer.REMOTE_PENDING)
+  callback(value)
 end
 
 Event.menu.add("menuEntitySearch", "PowerSettings_entitySearch", function(ev)
@@ -53,10 +50,10 @@ Event.menu.add("menuEntitySearch", "PowerSettings_entitySearch", function(ev)
   menu.label = ev.arg.label
 
   entries[1] = {
-    id=ev.arg.id .. ".searchbox",
+    id="searchbox",
     label=function() return searchLabel(query) end,
     textEntry=function(key) searchKeystroke(ev.arg, key) end,
-    textEntryToggle=function(active, confirm) searchToggle(ev.arg, active, confirm) end,
+    textEntryToggle=function(active, confirm) end,
     specialAction=function() searchSpecialAction(ev.arg) end
   }
 
@@ -67,12 +64,12 @@ Event.menu.add("menuEntitySearch", "PowerSettings_entitySearch", function(ev)
   if #filtered > 0 then
     for i, v in ipairs(filtered) do
       local entry = {}
-      entry.id = ev.arg.id .. ".result." .. v[1]
+      entry.id = "result." .. v[1]
       entry.label = string.sub(v[1], 1, v[2]-1)
         .. "\3*cc5" .. string.sub(v[1], v[2], v[3])
         .. "\3r" .. string.sub(v[1], v[3]+1, -1)
-      entry.action = function() resultAction(ev.arg.id, v[1]) end
-      entry.specialAction = function() Menu.selectByID(ev.arg.id .. ".searchbox") end
+      entry.action = function() resultAction(v[1], ev.arg.callback) end
+      entry.specialAction = function() Menu.selectByID("searchbox") end
       entries[2+i] = entry
     end
 
@@ -82,7 +79,7 @@ Event.menu.add("menuEntitySearch", "PowerSettings_entitySearch", function(ev)
   end
 
   entries[#entries+1] = {
-    id=ev.arg.id .. ".cancel",
+    id="cancel",
     label="Cancel",
     action=Menu.close
   }

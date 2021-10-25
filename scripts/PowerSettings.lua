@@ -28,7 +28,7 @@ for _, v in ipairs({"shared", "entitySchema"}) do
   module[v].time = function(args) return PSTNumber.setting(v, "time", args) end
   module[v].list = {}
 
-  for _, t in ipairs({"string", "number", "enum"}) do
+  for _, t in ipairs({"string", "number", "enum", "entity"}) do
     module[v].list[t] = function(args) return PSTList.setting(v, t, args) end
   end
 end

@@ -3,7 +3,9 @@ local Settings        = require "necro.config.Settings"
 local SettingsStorage = require "necro.config.SettingsStorage"
 local Utilities       = require "system.utils.Utilities"
 
-local PSStorage = require "PowerSettings.PSStorage"
+local PSEntity      = require "PowerSettings.types.Entity"
+local PSEntityEvent = require "PowerSettings.PSEntityEvent"
+local PSStorage     = require "PowerSettings.PSStorage"
 
 local module = {}
 
@@ -35,6 +37,9 @@ function module.setting(mode, itemType, args)
   if itemType == "enum" then
     args.itemFormat = args.itemFormat or function(value) return args.enum.prettyNames[value] end
     args.itemDefault = args.itemDefault or ({next(args.enum)})[2]
+  elseif itemType == "entity" then
+    args.itemFormat = args.itemFormat or PSEntity.format
+    PSEntityEvent.add(args)
   end
 
   PSStorage.add("list." .. itemType, args)
@@ -209,6 +214,54 @@ module.enum = {
     if useNext == nil or useNext == true then useNext = list[1] end
 
     arg.items[arg.selected] = useNext
+  end
+}
+
+module.entity = {
+  -- itemDefault is specified above
+  leftAction = function(arg)
+    local node = arg.node
+    local list = node.data.entities
+    local value = arg.items[arg.selected]
+    local leftValue = nil
+
+    for i, v in ipairs(list) do
+      if v == value then
+        if leftValue == nil then leftValue = list[#list] end
+        break
+      end
+      leftValue = v
+    end
+
+    if leftValue == nil then leftValue = "" end
+
+    arg.items[arg.selected] = leftValue
+  end,
+  rightAction = function(arg)
+    local node = arg.node
+    local list = node.data.entities
+    local value = arg.items[arg.selected]
+    local useNext = nil
+
+    for i, v in ipairs(list) do
+      if useNext == true then useNext = v break end
+      if v == value then useNext = true end
+    end
+
+    if useNext == nil or useNext == true then useNext = list[1] end
+    if useNext == nil then useNext = "" end
+
+    arg.items[arg.selected] = useNext
+  end,
+  action = function(arg)
+    Menu.open("PowerSettings_entitySearch", {
+      callback=function(value) arg.items[arg.selected] = value end,
+      label=arg.node.data.name .. " item",
+      list=arg.node.data.entities,
+      node=arg.node.data,
+      query="",
+      textEntry=false
+    })
   end
 }
 
