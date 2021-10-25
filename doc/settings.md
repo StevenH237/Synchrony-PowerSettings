@@ -13,7 +13,7 @@ But the main draw of Power Settings is its expanded settings types and options.
 * **`lowerBound`**: `string` or `function` - The lowest this value should go.
 * **`upperBound`**: `string` or `function` - The highest this value should go.
 
-If `lowerBound` or `upperBound` are strings, they are treated as setting ID nodes, and their value is the value of the referenced setting at the time you try to change this one. If they don't start with `mod.`, then they'll be prefixed with `mod.CurrentModName.` (then just enter the same as `id`).
+If `lowerBound` or `upperBound` are strings, they are treated as setting ID nodes, and their value is the value of the referenced setting at the time you try to change this one. If they don't start with `mod.`, then they'll be prefixed with `mod.CurrentModName.` (then you can just enter the same as `id`).
 
 If they're functions, they're called with no parameters, and the return value should be numeric.
 
@@ -47,3 +47,24 @@ It takes the following options, in addition to global options:
   * `string`: The list of allowed entities is filtered only to entities containing this component.
   * `table`: The list of allowed entities is filtered only to entities containing all of these components.
   * `function(table):bool`: All entities are passed into this function; the entities for which the function returns true are the entities that may be selected.
+
+## `list`
+List settings let the player create a multi-item list. They come in multiple types and have an interface for editing the list.
+
+All list settings' base types are `table`.
+
+In addition to the global options, a `list` setting has these:
+
+* `limit`: Maximum number of items in the list, defaults to `math.huge`.
+* `duplicates`: Whether or not the list allows duplicate values, defaults to `true`.
+* `itemFormat`: Format of individual items in the list view.
+
+The types of list are as follows:
+
+* `string`: List entries are strings. The following options are available:
+  * `maxLength`: Inclusive upper bound for the length of each string.
+* `number`: List entries are numeric. The following options are available:
+  * `minimum`: The minimum value of each number.
+  * `maximum`: The maximum value of each number.
+  * `step`: The value by which the number changes with offsets.
+  * `precision`: The value of which each number must be a multiple (offset by the minimum, or 0 if the minimum is nil).

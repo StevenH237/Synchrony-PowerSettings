@@ -5,6 +5,7 @@ local SettingsStorage = require "necro.config.SettingsStorage"
 
 local PSBitflag = require "PowerSettings.types.Bitflag"
 local PSEntity  = require "PowerSettings.types.Entity"
+local PSList    = require "PowerSettings.types.List"
 local PSNumber  = require "PowerSettings.types.Number"
 local PSStorage = require "PowerSettings.PSStorage"
 
@@ -37,18 +38,39 @@ Event.menu.override("settings", 1, function(func, ev)
         v.leftAction = function() PSEntity.leftAction(v.id) end
         v.rightAction = function() PSEntity.rightAction(v.id) end
 
+      -- Setting type "list.*"
+      elseif node.sType:sub(1, 5) == "list." then
+        v.action = function() PSList.action(v.id) end
+        v.textEntry = nil
+        v.textEntryToggle = nil
+
       -- Numeric setting types with greaterThan/lessThan parameters
       elseif node.sType == "number" or node.sType == "time" or node.sType == "percent" then
         if data.lowerBound or data.upperBound then
-          local cAction = v.action
-          local cLeftAction = v.leftAction
-          local cRightAction = v.rightAction
-          local cSpecialAction = v.specialAction
+          if v.action then
+            local cAction = v.action
+            v.action = function() cAction() PSNumber.validateBounds(v.id) end
+          end
 
-          v.action = function() cAction() PSNumber.validateBounds(v.id) end
-          v.leftAction = function() cLeftAction() PSNumber.validateBounds(v.id) end
-          v.rightAction = function() cRightAction() PSNumber.validateBounds(v.id) end
-          v.specialAction = function() cSpecialAction() PSNumber.validateBounds(v.id) end
+          if v.leftAction then
+            local cLeftAction = v.leftAction
+            v.leftAction = function() cLeftAction() PSNumber.validateBounds(v.id) end
+          end
+
+          if v.rightAction then
+            local cRightAction = v.rightAction
+            v.rightAction = function() cRightAction() PSNumber.validateBounds(v.id) end
+          end
+
+          if v.specialAction then
+            local cSpecialAction = v.specialAction
+            v.specialAction = function() cSpecialAction() PSNumber.validateBounds(v.id) end
+          end
+
+          if v.textEntryToggle then
+            local cTextEntryToggle = v.textEntryToggle
+            v.textEntryToggle = function(active, confirm) cTextEntryToggle(active, confirm) PSNumber.validateBounds(v.id) end
+          end
         end
       end
 

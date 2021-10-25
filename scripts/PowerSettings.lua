@@ -2,10 +2,11 @@ local Settings = require "necro.config.Settings"
 
 local NixLib = require "NixLib.NixLib"
 
+local PSStorage  = require "PowerSettings.PSStorage"
 local PSTBitflag = require "PowerSettings.types.Bitflag"
 local PSTEntity  = require "PowerSettings.types.Entity"
+local PSTList    = require "PowerSettings.types.List"
 local PSTNumber  = require "PowerSettings.types.Number"
-local PSStorage  = require "PowerSettings.PSStorage"
 
 local module = {}
 
@@ -25,6 +26,11 @@ for _, v in ipairs({"shared", "entitySchema"}) do
   module[v].number = function(args) return PSTNumber.setting(v, "number", args) end
   module[v].percent = function(args) return PSTNumber.setting(v, "percent", args) end
   module[v].time = function(args) return PSTNumber.setting(v, "time", args) end
+  module[v].list = {}
+
+  for _, t in ipairs({"string", "number", "enum"}) do
+    module[v].list[t] = function(args) return PSTList.setting(v, t, args) end
+  end
 end
 
 function module.group(args)

@@ -85,7 +85,7 @@ function module.rightAction(id)
   local useNext = nil
 
   for i, v in ipairs(list) do
-    if useNext == true then useNext = v end
+    if useNext == true then useNext = v break end
     if v == value then useNext = true end
   end
 
