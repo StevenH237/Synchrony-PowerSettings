@@ -39,6 +39,7 @@ function module.setting(mode, itemType, args)
     args.itemDefault = args.itemDefault or ({next(args.enum)})[2]
   elseif itemType == "entity" then
     args.itemFormat = args.itemFormat or PSEntity.format
+    args.entities = PSEntity.getFilteredEntities(args.filter)
     PSEntityEvent.add(args)
   end
 

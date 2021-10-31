@@ -180,19 +180,6 @@ Event.menu.add("menuList", "PowerSettings_list", function(ev)
   local node = arg.node
   local itemType = node.sType:sub(6, -1)
 
-  -- The controls, explained
-  -- This entry goes below the currently selected item
-  local controls = {
-    font={
-      fillColor=-1,
-      font="gfx/necro/font/necrosans-6.png;",
-      shadowColor=-16777216,
-      size=6
-    },
-    id=arg.id .. ".controls",
-    label=labelControls(arg.mode)
-  }
-
   for i = 1, #items do
     local entry = {
       id=arg.id .. "." .. i,

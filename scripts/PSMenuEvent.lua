@@ -44,6 +44,22 @@ Event.menu.override("settings", 1, function(func, ev)
         v.textEntry = nil
         v.textEntryToggle = nil
 
+      elseif node.sType == "label" then
+        v.action = nil
+        v.textEntry = nil
+        v.textEntryToggle = nil
+        v.leftAction = nil
+        v.rightAction = nil
+        v.specialAction = nil
+        if not node.data.large then
+          v.font={
+            fillColor=-1,
+            font="gfx/necro/font/necrosans-6.png;",
+            shadowColor=-16777216,
+            size=6
+          }
+        end
+
       -- Numeric setting types with greaterThan/lessThan parameters
       elseif node.sType == "number" or node.sType == "time" or node.sType == "percent" then
         if data.lowerBound or data.upperBound then
@@ -76,8 +92,8 @@ Event.menu.override("settings", 1, function(func, ev)
 
       -- Code for basic settings
       if not SettingsStorage.get("config.showAdvanced") then
-        if data.ps_basicName then
-          v.label = function() return data.ps_basicName .. ": " .. SettingsStorage.getFormattedValue(v.id, SettingsStorage.get(v.id, Settings.Layer.REMOTE_PENDING)) end
+        if data.basicName then
+          v.label = function() return data.basicName .. ": " .. SettingsStorage.getFormattedValue(v.id, SettingsStorage.get(v.id, Settings.Layer.REMOTE_PENDING)) end
         end
       end
 

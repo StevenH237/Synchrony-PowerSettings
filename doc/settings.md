@@ -48,6 +48,15 @@ It takes the following options, in addition to global options:
   * `table`: The list of allowed entities is filtered only to entities containing all of these components.
   * `function(table):bool`: All entities are passed into this function; the entities for which the function returns true are the entities that may be selected.
 
+## `label`
+A label setting just inserts a dummy item with text on it.
+
+The setting's base type is `action`, but it does nothing.
+
+It takes the following options, in addition to global options:
+
+* `large`: A boolean; if true the text will be displayed at normal size; if false or omitted, the label will be small.
+
 ## `list`
 List settings let the player create a multi-item list. They come in multiple types and have an interface for editing the list.
 
