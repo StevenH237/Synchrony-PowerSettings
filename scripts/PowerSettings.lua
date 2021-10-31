@@ -8,6 +8,7 @@ local PSTEntity  = require "PowerSettings.types.Entity"
 local PSTLabel   = require "PowerSettings.types.Label"
 local PSTList    = require "PowerSettings.types.List"
 local PSTNumber  = require "PowerSettings.types.Number"
+local PSTPreset  = require "PowerSettings.types.Preset"
 
 local module = {}
 
@@ -28,6 +29,7 @@ for _, v in ipairs({"shared", "entitySchema"}) do
   module[v].percent = function(args) return PSTNumber.setting(v, "percent", args) end
   module[v].time = function(args) return PSTNumber.setting(v, "time", args) end
   module[v].label = function(args) return PSTLabel.setting(v, args) end
+  module[v].preset = function(args) return PSTPreset.setting(v, args) end
   module[v].list = {}
 
   for _, t in ipairs({"string", "number", "enum", "entity"}) do
