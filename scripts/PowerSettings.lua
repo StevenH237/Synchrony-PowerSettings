@@ -1,4 +1,5 @@
-local Settings = require "necro.config.Settings"
+local Settings        = require "necro.config.Settings"
+local SettingsStorage = require "necro.config.SettingsStorage"
 
 local NixLib = require "NixLib.NixLib"
 
@@ -13,6 +14,9 @@ local PSTPreset  = require "PowerSettings.types.Preset"
 local module = {}
 
 local function defaultSetting(mode, sType, args)
+  if sType == "action" and args.action == nil then
+    args.action = function() end
+  end
   PSStorage.add(sType, args)
   return Settings[mode][sType](args)
 end
@@ -38,7 +42,51 @@ for _, v in ipairs({"shared", "entitySchema"}) do
 end
 
 function module.group(args)
+  PSStorage.add("group", args)
   return Settings.group(args)
+end
+
+function module.reset(prefix)
+  local keys = SettingsStorage.listKeys(prefix, Settings.Layer.REMOTE_OVERRIDE)
+  for _, key in ipairs(keys) do
+    SettingsStorage.set(key, nil, Settings.Layer.REMOTE_PENDING)
+  end
+end
+
+function module.get(setting, layers)
+  layers = layers or {Settings.Layer.REMOTE_PENDING, Settings.Layer.REMOTE_OVERRIDE}
+
+  -- Do we have an ignore condition?
+  local node = PSStorage.get(setting)
+  if node then
+    local ignoredIf = node.data.ignoredIf
+    local visibleIf = node.data.visibleIf
+    -- If it exists and is true, return the default value.
+    if type(ignoredIf) == "function" then
+      if ignoredIf() then
+        return node.data.default
+      end
+    elseif type(ignoredIf) == "bool" then
+      -- This mostly exists to allow "ignoredIf=false" so that an invisible setting still affects the gameplay.
+      if ignoredIf then
+        return node.data.default
+      end
+    elseif type(visibleIf) == "function" then
+      -- Do we have a visibility condition?
+      -- If so and it's *false*, return the default value.
+      if not visibleIf() then
+        return node.data.default
+      end
+    end
+  end
+
+  -- Otherwise try grabbing it by the layers.
+  for i, layer in ipairs(layers) do
+    local try = SettingsStorage.get(setting, layer)
+    if try ~= nil then return try end
+  end
+
+  return node.data.default
 end
 
 return module

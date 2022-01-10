@@ -2,23 +2,48 @@ local Event           = require "necro.event.Event"
 local Menu            = require "necro.menu.Menu"
 local Settings        = require "necro.config.Settings"
 local SettingsStorage = require "necro.config.SettingsStorage"
+local Utilities       = require "system.utils.Utilities"
 
-local PSBitflag = require "PowerSettings.types.Bitflag"
-local PSEntity  = require "PowerSettings.types.Entity"
-local PSList    = require "PowerSettings.types.List"
-local PSNumber  = require "PowerSettings.types.Number"
-local PSStorage = require "PowerSettings.PSStorage"
+local PowerSettings = require "PowerSettings.PowerSettings"
+local PSBitflag     = require "PowerSettings.types.Bitflag"
+local PSEntity      = require "PowerSettings.types.Entity"
+local PSList        = require "PowerSettings.types.List"
+local PSNumber      = require "PowerSettings.types.Number"
+local PSStorage     = require "PowerSettings.PSStorage"
 
 Event.menu.override("settings", 1, function(func, ev)
   func(ev)
 
   if ev.arg.prefix:sub(1,4) == "mod." then
-    for i, v in ipairs(ev.menu.entries) do
+    local entries = ev.menu.entries
+    local i = 1
+
+    while i <= #entries do
+      local v = entries[i]
+
+      if not v.id then
+        i = i + 1
+        goto notNode
+      end
+
       local node = PSStorage.get(v.id)
 
-      if not node then goto notNode end
+      -- If it's not a PowerSettings node
+      if not node then
+        i = i + 1
+        goto notNode
+      end
 
       local data = node.data
+
+      -- If it's an invisible node
+      local visibility = data.visibleIf
+      if type(visibility) == "function" then
+        if not visibility() then
+          table.remove(entries, i)
+          goto notNode
+        end
+      end
 
       -- Setting type "bitflag"
       if node.sType == "bitflag" then
@@ -60,8 +85,9 @@ Event.menu.override("settings", 1, function(func, ev)
           }
         end
 
-      -- Numeric setting types with greaterThan/lessThan parameters
+      -- Numeric setting types
       elseif node.sType == "number" or node.sType == "time" or node.sType == "percent" then
+        -- greaterThan/lessThan parameters
         if data.lowerBound or data.upperBound then
           if v.action then
             local cAction = v.action
@@ -88,6 +114,12 @@ Event.menu.override("settings", 1, function(func, ev)
             v.textEntryToggle = function(active, confirm) cTextEntryToggle(active, confirm) PSNumber.validateBounds(v.id) end
           end
         end
+
+      elseif node.sType == "action" then
+        -- side and special actions
+        if data.leftAction then v.leftAction = data.leftAction end
+        if data.rightAction then v.rightAction = data.rightAction end
+        if data.specialAction then v.specialAction = data.specialAction end
       end
 
       -- Code for basic settings
@@ -97,6 +129,7 @@ Event.menu.override("settings", 1, function(func, ev)
         end
       end
 
+      i = i + 1
       ::notNode::
     end
   end

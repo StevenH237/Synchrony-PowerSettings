@@ -30,7 +30,7 @@ function module.getFilteredEntities(filter)
   local out = {}
 
   if type(filter) == "function" then
-    for i2, v2 in Entities.typesWithComponents({}) do
+    for i2, v2 in Entities.prototypesWithComponents({}) do
       if filter(v2) then
         out[#out+1] = v2.name
       end
