@@ -6,41 +6,45 @@ local SettingsStorage = require "necro.config.SettingsStorage"
 local PSStorage     = require "PowerSettings.PSStorage"
 local PSEntityEvent = require "PowerSettings.PSEntityEvent"
 
+local NixLib = require "NixLib.NixLib"
+
 local module = {}
 
 function module.format(value)
-  local entity = Entities.getEntityPrototype(value)
+  local component = NixLib.getComponent(value)
 
-  if entity then
-    if entity.friendlyName then
-      if SettingsStorage.get("config.showAdvanced") then
-        return entity.friendlyName.name .. " (" .. value .. ")"
-      else
-        return entity.friendlyName.name
-      end
-    else
-      return value
-    end
+  if component then
+    return value
   else
-    return "(No such entity: " .. value .. ")"
+    return "(No such component: " .. value .. ")"
   end
 end
 
-function module.getFilteredEntities(filter)
+function module.getFilteredComponents(filter)
   local out = {}
 
   if type(filter) == "function" then
-    for i2, v2 in Entities.prototypesWithComponents({}) do
-      if filter(v2) then
-        out[#out + 1] = v2.name
+    for k, v in pairs(NixLib.getComponents()) do
+      if filter(v) then
+        out[#out + 1] = v.name
       end
     end
   elseif type(filter) == "table" then
-    out = Entities.getEntityTypesWithComponents(filter)
+    for i, v in ipairs(filter) do
+      if NixLib.getComponent(v) then
+        out[#out + 1] = v.name
+      end
+    end
   elseif type(filter) == "string" then
-    out = Entities.getEntityTypesWithComponents({ filter })
+    for k, v in pairs(NixLib.getComponents()) do
+      if v.name:sub(1, filter:len()) == filter then
+        out[#out + 1] = v.name
+      end
+    end
   else
-    out = Entities.getEntityTypesWithComponents({})
+    for k, v in pairs(NixLib.getComponents()) do
+      out[#out + 1] = v.name
+    end
   end
 
   return out
@@ -49,10 +53,10 @@ end
 function module.action(id)
   local node = PSStorage.get(id).data
 
-  Menu.open("PowerSettings_entitySearch", {
+  Menu.open("PowerSettings_componentSearch", {
     callback = function(value) SettingsStorage.set(id, value, Settings.Layer.REMOTE_PENDING) end,
     label = node.name,
-    list = node.entities,
+    list = node.components,
     node = node,
     query = "",
     textEntry = false
@@ -61,7 +65,7 @@ end
 
 function module.leftAction(id)
   local node = PSStorage.get(id)
-  local list = node.data.entities
+  local list = node.data.components
   local value = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.getDefaultValue(id)
   local leftValue = nil
 
@@ -80,7 +84,7 @@ end
 
 function module.rightAction(id)
   local node = PSStorage.get(id)
-  local list = node.data.entities
+  local list = node.data.components
   local value = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.getDefaultValue(id)
   local useNext = nil
 
@@ -98,9 +102,9 @@ end
 function module.setting(mode, args)
   args.editAsString = false -- forcibly false, we'll use a menu instead
   args.format = args.format or module.format
-  args.entities = module.getFilteredEntities(args.filter)
-  PSStorage.add("entity", args)
-  PSEntityEvent.add(args)
+  args.components = module.getFilteredComponents(args.filter)
+  PSStorage.add("component", args)
+  PSEntityEvent.addc(args)
   return Settings[mode].string(args)
 end
 

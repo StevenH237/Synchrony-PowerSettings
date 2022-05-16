@@ -1,12 +1,12 @@
 {
 	"name": "PowerSettings",
 	"displayName": "Power Settings",
-	"version": "1.0.0",
-	"synchronyVersion": "0.43",
+	"version": "1.1.0",
+	"synchronyVersion": "0.54",
 	"description": "No description given.",
 	"author": "Nixill",
 	"dependencies": {
-		"NixLib": "1.2.0"
+		"NixLib": "1.3.0"
 	},
 	"api": {
 		"scriptPath": "scripts"

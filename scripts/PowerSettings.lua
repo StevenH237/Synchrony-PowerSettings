@@ -3,13 +3,14 @@ local SettingsStorage = require "necro.config.SettingsStorage"
 
 local NixLib = require "NixLib.NixLib"
 
-local PSStorage  = require "PowerSettings.PSStorage"
-local PSTBitflag = require "PowerSettings.types.Bitflag"
-local PSTEntity  = require "PowerSettings.types.Entity"
-local PSTLabel   = require "PowerSettings.types.Label"
-local PSTList    = require "PowerSettings.types.List"
-local PSTNumber  = require "PowerSettings.types.Number"
-local PSTPreset  = require "PowerSettings.types.Preset"
+local PSStorage    = require "PowerSettings.PSStorage"
+local PSTBitflag   = require "PowerSettings.types.Bitflag"
+local PSTComponent = require "PowerSettings.types.Component"
+local PSTEntity    = require "PowerSettings.types.Entity"
+local PSTLabel     = require "PowerSettings.types.Label"
+local PSTList      = require "PowerSettings.types.List"
+local PSTNumber    = require "PowerSettings.types.Number"
+local PSTPreset    = require "PowerSettings.types.Preset"
 
 local module = {}
 
@@ -21,13 +22,14 @@ local function defaultSetting(mode, sType, args)
   return Settings[mode][sType](args)
 end
 
-for _, v in ipairs({"shared", "entitySchema"}) do
+for _, v in ipairs({ "shared", "entitySchema" }) do
   module[v] = {}
-  for _, t in ipairs({"bool", "enum", "string", "table", "choice", "action"}) do
+  for _, t in ipairs({ "bool", "enum", "string", "table", "choice", "action" }) do
     module[v][t] = function(args) return defaultSetting(v, t, args) end
   end
 
   module[v].bitflag = function(args) return PSTBitflag.setting(v, args) end
+  module[v].component = function(args) return PSTComponent.setting(v, args) end
   module[v].entity = function(args) return PSTEntity.setting(v, args) end
   module[v].number = function(args) return PSTNumber.setting(v, "number", args) end
   module[v].percent = function(args) return PSTNumber.setting(v, "percent", args) end
@@ -36,7 +38,7 @@ for _, v in ipairs({"shared", "entitySchema"}) do
   module[v].preset = function(args) return PSTPreset.setting(v, args) end
   module[v].list = {}
 
-  for _, t in ipairs({"string", "number", "enum", "entity"}) do
+  for _, t in ipairs({ "string", "number", "enum", "entity", "component" }) do
     module[v].list[t] = function(args) return PSTList.setting(v, t, args) end
   end
 end
@@ -54,7 +56,7 @@ function module.reset(prefix)
 end
 
 function module.get(setting, layers)
-  layers = layers or {Settings.Layer.REMOTE_PENDING, Settings.Layer.REMOTE_OVERRIDE}
+  layers = layers or { Settings.Layer.REMOTE_PENDING, Settings.Layer.REMOTE_OVERRIDE }
 
   -- Do we have an ignore condition?
   local node = PSStorage.get(setting)

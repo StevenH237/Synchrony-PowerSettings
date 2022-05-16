@@ -26,17 +26,17 @@ local function resultAction(value, callback)
   callback(value)
 end
 
-Event.menu.add("menuEntitySearch", "PowerSettings_entitySearch", function(ev)
+Event.menu.add("menuComponentSearch", "PowerSettings_componentSearch", function(ev)
   local menu = {}
   local entries = {}
   local advanced = SettingsStorage.get("config.showAdvanced")
 
-  local entities = ev.arg.list
+  local components = ev.arg.list
   local query = ev.arg.query
 
   local filtered = {}
 
-  for i, v in ipairs(entities) do
+  for i, v in ipairs(components) do
     local vl = v:lower()
     local n = query:lower()
     local iStart, iEnd = vl:find(n, 1, true)

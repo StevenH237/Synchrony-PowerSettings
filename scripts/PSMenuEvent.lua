@@ -7,6 +7,7 @@ local Utilities       = require "system.utils.Utilities"
 local PowerSettings = require "PowerSettings.PowerSettings"
 local PSBitflag     = require "PowerSettings.types.Bitflag"
 local PSEntity      = require "PowerSettings.types.Entity"
+local PSComponent   = require "PowerSettings.types.Component"
 local PSList        = require "PowerSettings.types.List"
 local PSNumber      = require "PowerSettings.types.Number"
 local PSStorage     = require "PowerSettings.PSStorage"
@@ -14,7 +15,7 @@ local PSStorage     = require "PowerSettings.PSStorage"
 Event.menu.override("settings", 1, function(func, ev)
   func(ev)
 
-  if ev.arg.prefix:sub(1,4) == "mod." then
+  if ev.arg.prefix:sub(1, 4) == "mod." then
     local entries = ev.menu.entries
     local i = 1
 
@@ -57,13 +58,19 @@ Event.menu.override("settings", 1, function(func, ev)
         v.leftAction = function() PSBitflag.leftAction(v.id) end
         v.rightAction = function() PSBitflag.rightAction(v.id) end
 
-      -- Setting type "entity"
+        -- Setting type "entity"
       elseif node.sType == "entity" then
         v.action = function() PSEntity.action(v.id) end
         v.leftAction = function() PSEntity.leftAction(v.id) end
         v.rightAction = function() PSEntity.rightAction(v.id) end
 
-      -- Setting type "list.*"
+        -- Setting type "component"
+      elseif node.sType == "component" then
+        v.action = function() PSComponent.action(v.id) end
+        v.leftAction = function() PSComponent.leftAction(v.id) end
+        v.rightAction = function() PSComponent.rightAction(v.id) end
+
+        -- Setting type "list.*"
       elseif node.sType:sub(1, 5) == "list." then
         v.action = function() PSList.action(v.id) end
         v.textEntry = nil
@@ -77,15 +84,15 @@ Event.menu.override("settings", 1, function(func, ev)
         v.rightAction = nil
         v.specialAction = nil
         if not node.data.large then
-          v.font={
-            fillColor=-1,
-            font="gfx/necro/font/necrosans-6.png;",
-            shadowColor=-16777216,
-            size=6
+          v.font = {
+            fillColor = -1,
+            font = "gfx/necro/font/necrosans-6.png;",
+            shadowColor = -16777216,
+            size = 6
           }
         end
 
-      -- Numeric setting types
+        -- Numeric setting types
       elseif node.sType == "number" or node.sType == "time" or node.sType == "percent" then
         -- greaterThan/lessThan parameters
         if data.lowerBound or data.upperBound then

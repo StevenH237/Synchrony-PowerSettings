@@ -35,6 +35,19 @@ It takes the following options, in addition to global options:
 
 ¹ Either `flags` or `presets` is required.
 
+## `component`
+The component setting lets the player select a component from a limited subset of components.
+
+The setting's base type is `text`. The text returned is the selected component's `name`.
+
+It takes the following options, in addition to global options:
+
+* `filter`: Has different meanings depending on the type of its value:
+  * `nil`: The list of allowed components is unfiltered; any component may be selected.
+  * `string`: The list of allowed components is filtered to those that start with this string.
+  * `table`: The list of allowed components is filtered only to specified components that actually exist.
+  * `function(table):bool`: All components are passed into this function one at a time; the components for which the function returns true are the components that may be selected.
+
 ## `entity`
 The entity setting lets the player select an entity from a limited subset of entities.
 
@@ -46,7 +59,7 @@ It takes the following options, in addition to global options:
   * `nil`: The list of allowed entities is unfiltered; any entity type may be selected.
   * `string`: The list of allowed entities is filtered only to entities containing this component.
   * `table`: The list of allowed entities is filtered only to entities containing all of these components.
-  * `function(table):bool`: All entities are passed into this function; the entities for which the function returns true are the entities that may be selected.
+  * `function(table):bool`: All entities are passed into this function one at a time; the entities for which the function returns true are the entities that may be selected.
 
 ## `label`
 A label setting just inserts a dummy item with text on it.

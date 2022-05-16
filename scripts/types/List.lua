@@ -3,6 +3,7 @@ local Settings        = require "necro.config.Settings"
 local SettingsStorage = require "necro.config.SettingsStorage"
 local Utilities       = require "system.utils.Utilities"
 
+local PSComponent   = require "PowerSettings.types.Component"
 local PSEntity      = require "PowerSettings.types.Entity"
 local PSEntityEvent = require "PowerSettings.PSEntityEvent"
 local PSStorage     = require "PowerSettings.PSStorage"
@@ -17,10 +18,10 @@ end
 
 function module.action(id)
   Menu.open("PowerSettings_list", {
-    id=id,
-    items=SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or Utilities.fastCopy(SettingsStorage.getDefaultValue(id)),
-    mode=module.Mode.MODIFY,
-    node=PSStorage.get(id)
+    id = id,
+    items = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or Utilities.fastCopy(SettingsStorage.getDefaultValue(id)),
+    mode = module.Mode.MODIFY,
+    node = PSStorage.get(id)
   })
 end
 
@@ -36,11 +37,15 @@ function module.setting(mode, itemType, args)
 
   if itemType == "enum" then
     args.itemFormat = args.itemFormat or function(value) return args.enum.prettyNames[value] end
-    args.itemDefault = args.itemDefault or ({next(args.enum)})[2]
+    args.itemDefault = args.itemDefault or ({ next(args.enum) })[2]
   elseif itemType == "entity" then
     args.itemFormat = args.itemFormat or PSEntity.format
     args.entities = PSEntity.getFilteredEntities(args.filter)
     PSEntityEvent.add(args)
+  elseif itemType == "component" then
+    args.itemFormat = args.itemFormat or PSComponent.format
+    args.components = PSComponent.getFilteredComponents(args.filter)
+    PSEntityEvent.addc(args)
   end
 
   PSStorage.add("list." .. itemType, args)
@@ -130,19 +135,19 @@ local function numberTextEntryToggle(arg, active, confirm)
 end
 
 module.number = {
-  itemFormat=tostring,
-  itemDefault=0,
-  step=1,
-  editAsString=numberEditAsString,
-  textEntryToggle=numberTextEntryToggle,
-  leftAction=function(arg)
+  itemFormat = tostring,
+  itemDefault = 0,
+  step = 1,
+  editAsString = numberEditAsString,
+  textEntryToggle = numberTextEntryToggle,
+  leftAction = function(arg)
     local value = arg.items[arg.selected]
     local lower = value - (arg.node.data.step or 1)
-    print({value, lower, arg.node.data.step})
+    print({ value, lower, arg.node.data.step })
     if arg.node.data.minimum and lower < arg.node.data.minimum then lower = arg.node.data.minimum end
     arg.items[arg.selected] = lower
   end,
-  rightAction=function(arg)
+  rightAction = function(arg)
     local value = arg.items[arg.selected]
     local higher = value + (arg.node.data.step or 1)
     if arg.node.data.maximum and higher > arg.node.data.maximum then higher = arg.node.data.maximum end
@@ -151,28 +156,28 @@ module.number = {
 }
 
 module.percent = {
-  itemFormat=Settings.Format.PERCENT,
-  itemDefault=1,
-  step=0.05,
-  minimum=0,
-  maximum=1,
-  editAsString=numberEditAsString,
-  textEntryToggle=numberTextEntryToggle,
-  leftAction=module.number.leftAction,
-  rightAction=module.number.rightAction
+  itemFormat = Settings.Format.PERCENT,
+  itemDefault = 1,
+  step = 0.05,
+  minimum = 0,
+  maximum = 1,
+  editAsString = numberEditAsString,
+  textEntryToggle = numberTextEntryToggle,
+  leftAction = module.number.leftAction,
+  rightAction = module.number.rightAction
 }
 
 module.string = {
-  itemFormat=tostring,
-  itemDefault="",
-  textEntry=function(arg, key)
+  itemFormat = tostring,
+  itemDefault = "",
+  textEntry = function(arg, key)
     if key then
       arg.textEntry = arg.textEntry .. string.char(key)
     else
       arg.textEntry = string.sub(arg.textEntry, 1, -2)
     end
   end,
-  textEntryToggle=function(arg, active, confirm)
+  textEntryToggle = function(arg, active, confirm)
     if active then
       arg.textEntry = arg.items[arg.selected]
     else
@@ -186,7 +191,7 @@ module.string = {
 
 module.enum = {
   -- itemDefault is specified above
-  leftAction=function(arg)
+  leftAction = function(arg)
     local value = arg.items[arg.selected]
     local list = arg.node.data.enum.valueList
     local leftValue = nil
@@ -201,7 +206,7 @@ module.enum = {
 
     arg.items[arg.selected] = leftValue
   end,
-  rightAction=function(arg)
+  rightAction = function(arg)
     local value = arg.items[arg.selected]
     local list = arg.node.data.enum.valueList
 
@@ -256,12 +261,60 @@ module.entity = {
   end,
   action = function(arg)
     Menu.open("PowerSettings_entitySearch", {
-      callback=function(value) arg.items[arg.selected] = value end,
-      label=arg.node.data.name .. " item",
-      list=arg.node.data.entities,
-      node=arg.node.data,
-      query="",
-      textEntry=false
+      callback = function(value) arg.items[arg.selected] = value end,
+      label = arg.node.data.name .. " item",
+      list = arg.node.data.entities,
+      node = arg.node.data,
+      query = "",
+      textEntry = false
+    })
+  end
+}
+
+module.component = {
+  -- itemDefault is specified above
+  leftAction = function(arg)
+    local node = arg.node
+    local list = node.data.components
+    local value = arg.items[arg.selected]
+    local leftValue = nil
+
+    for i, v in ipairs(list) do
+      if v == value then
+        if leftValue == nil then leftValue = list[#list] end
+        break
+      end
+      leftValue = v
+    end
+
+    if leftValue == nil then leftValue = "" end
+
+    arg.items[arg.selected] = leftValue
+  end,
+  rightAction = function(arg)
+    local node = arg.node
+    local list = node.data.components
+    local value = arg.items[arg.selected]
+    local useNext = nil
+
+    for i, v in ipairs(list) do
+      if useNext == true then useNext = v break end
+      if v == value then useNext = true end
+    end
+
+    if useNext == nil or useNext == true then useNext = list[1] end
+    if useNext == nil then useNext = "" end
+
+    arg.items[arg.selected] = useNext
+  end,
+  action = function(arg)
+    Menu.open("PowerSettings_componentSearch", {
+      callback = function(value) arg.items[arg.selected] = value end,
+      label = arg.node.data.name .. " item",
+      list = arg.node.data.components,
+      node = arg.node.data,
+      query = "",
+      textEntry = false
     })
   end
 }
