@@ -12,12 +12,57 @@ local PSList        = require "PowerSettings.types.List"
 local PSNumber      = require "PowerSettings.types.Number"
 local PSStorage     = require "PowerSettings.PSStorage"
 
+local function addActionFunctions(v, addedFunction)
+  if v.action then
+    local cAction = v.action
+    v.action = function()
+      cAction()
+      addedFunction()
+    end
+  end
+
+  if v.leftAction then
+    local cLeftAction = v.leftAction
+    v.leftAction = function()
+      cLeftAction()
+      addedFunction()
+    end
+  end
+
+  if v.rightAction then
+    local cRightAction = v.rightAction
+    v.rightAction = function()
+      cRightAction()
+      addedFunction()
+    end
+  end
+
+  if v.specialAction then
+    local cSpecialAction = v.specialAction
+    v.specialAction = function()
+      cSpecialAction()
+      addedFunction()
+    end
+  end
+
+  if v.textEntryToggle then
+    local cTextEntryToggle = v.textEntryToggle
+    v.textEntryToggle = function(active, confirm)
+      cTextEntryToggle(active, confirm)
+      addedFunction()
+    end
+  end
+end
+
 Event.menu.override("settings", 1, function(func, ev)
   func(ev)
 
   if ev.arg.prefix:sub(1, 4) == "mod." then
     local entries = ev.menu.entries
     local i = 1
+
+    local firstHeader = nil
+    local lastHeader = nil
 
     while i <= #entries do
       local v = entries[i]
@@ -44,6 +89,11 @@ Event.menu.override("settings", 1, function(func, ev)
           table.remove(entries, i)
           goto notNode
         end
+      elseif type(visibility) == "boolean" then
+        if not visibility then
+          table.remove(entries, i)
+          goto notNode
+        end
       end
 
       -- Setting type "bitflag"
@@ -53,29 +103,73 @@ Event.menu.override("settings", 1, function(func, ev)
             PSBitflag.action(v.id)
           else
             PSBitflag.rightAction(v.id)
+            if data.refreshOnChange then
+              Menu.update()
+            end
           end
         end
-        v.leftAction = function() PSBitflag.leftAction(v.id) end
-        v.rightAction = function() PSBitflag.rightAction(v.id) end
-
-        -- Setting type "entity"
-      elseif node.sType == "entity" then
-        v.action = function() PSEntity.action(v.id) end
-        v.leftAction = function() PSEntity.leftAction(v.id) end
-        v.rightAction = function() PSEntity.rightAction(v.id) end
+        v.leftAction = function()
+          PSBitflag.leftAction(v.id)
+          if data.refreshOnChange then
+            Menu.update()
+          end
+        end
+        v.rightAction = function()
+          PSBitflag.rightAction(v.id)
+          if data.refreshOnChange then
+            Menu.update()
+          end
+        end
 
         -- Setting type "component"
       elseif node.sType == "component" then
         v.action = function() PSComponent.action(v.id) end
-        v.leftAction = function() PSComponent.leftAction(v.id) end
-        v.rightAction = function() PSComponent.rightAction(v.id) end
+        v.leftAction = function()
+          PSComponent.leftAction(v.id)
+          if data.refreshOnChange then
+            Menu.update()
+          end
+        end
+        v.rightAction = function()
+          PSComponent.rightAction(v.id)
+          if data.refreshOnChange then
+            Menu.update()
+          end
+        end
 
-        -- Setting type "list.*"
-      elseif node.sType:sub(1, 5) == "list." then
-        v.action = function() PSList.action(v.id) end
-        v.textEntry = nil
-        v.textEntryToggle = nil
+        -- Setting type "entity"
+      elseif node.sType == "entity" then
+        v.action = function() PSEntity.action(v.id) end
+        v.leftAction = function()
+          PSEntity.leftAction(v.id)
+          if data.refreshOnChange then
+            Menu.update()
+          end
+        end
+        v.rightAction = function()
+          PSEntity.rightAction(v.id)
+          if data.refreshOnChange then
+            Menu.update()
+          end
+        end
 
+      elseif node.sType == "header" then
+        v.action = nil
+
+        if firstHeader == nil then
+          firstHeader = v
+          lastHeader = v
+        end
+
+        firstHeader.leftAction = function() Menu.selectByID(v.id) end --First+left selects this
+        ---@diagnostic disable-next-line: need-check-nil
+        v.rightAction = function() Menu.selectByID(firstHeader.id) end --This+right selects first
+        lastHeader.rightAction = function() Menu.selectByID(v.id) end --Last+right selects this
+        v.leftAction = function() Menu.selectByID(lastHeader.id) end --This+left selects last
+
+        lastHeader = v
+
+        -- Setting type "label"
       elseif node.sType == "label" then
         v.action = nil
         v.textEntry = nil
@@ -92,34 +186,32 @@ Event.menu.override("settings", 1, function(func, ev)
           }
         end
 
-        -- Numeric setting types
+        -- Setting type "list.*"
+      elseif node.sType:sub(1, 5) == "list." then
+        v.action = function() PSList.action(v.id) end
+        v.textEntry = nil
+        v.textEntryToggle = nil
+
+        -- Remaining setting types
+      elseif node.sType == "group" then
+        if data.openAction then
+          local cAction = v.action
+          v.action = function() data.openAction() cAction() end
+        end
+
       elseif node.sType == "number" or node.sType == "time" or node.sType == "percent" then
         -- greaterThan/lessThan parameters
         if data.lowerBound or data.upperBound then
-          if v.action then
-            local cAction = v.action
-            v.action = function() cAction() PSNumber.validateBounds(v.id) end
-          end
+          addActionFunctions(v, function() PSNumber.validateBounds(v.id) end)
+        end
 
-          if v.leftAction then
-            local cLeftAction = v.leftAction
-            v.leftAction = function() cLeftAction() PSNumber.validateBounds(v.id) end
-          end
+        if data.refreshOnChange then
+          addActionFunctions(v, Menu.update)
+        end
 
-          if v.rightAction then
-            local cRightAction = v.rightAction
-            v.rightAction = function() cRightAction() PSNumber.validateBounds(v.id) end
-          end
-
-          if v.specialAction then
-            local cSpecialAction = v.specialAction
-            v.specialAction = function() cSpecialAction() PSNumber.validateBounds(v.id) end
-          end
-
-          if v.textEntryToggle then
-            local cTextEntryToggle = v.textEntryToggle
-            v.textEntryToggle = function(active, confirm) cTextEntryToggle(active, confirm) PSNumber.validateBounds(v.id) end
-          end
+      elseif node.sType == "string" or node.sType == "bool" or node.sType == "enum" then
+        if data.refreshOnChange then
+          addActionFunctions(v, Menu.update)
         end
 
       elseif node.sType == "action" then
