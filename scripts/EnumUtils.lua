@@ -1,6 +1,9 @@
 local module = {}
 
 function module.getName(table, value)
+  local hasData, data = pcall(function(e) return e.data end, table)
+  if hasData and data and data[value] ~= nil and data[value].name ~= nil then return data[value].name end
+
   local hasPrettyNames, prettyNames = pcall(function(e) return e.prettyNames end, table)
   if hasPrettyNames and prettyNames and prettyNames[value] ~= nil then return prettyNames[value] end
 

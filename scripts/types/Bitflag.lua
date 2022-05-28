@@ -15,8 +15,8 @@ function module.format(value, presets)
   local n = EnumUtils.getName(presets, value)
 
   if n ~= nil then
-      if SettingsStorage.get("config.showAdvanced") then return n .. " (0x" .. hex .. ")"
-      else return n end
+    if SettingsStorage.get("config.showAdvanced") then return n .. " (0x" .. hex .. ")"
+    else return n end
   end
 
   local split = NixLib.bitSplit(value)

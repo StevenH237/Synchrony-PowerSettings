@@ -88,7 +88,7 @@ function module.get(setting, layers)
     if try ~= nil then return try end
   end
 
-  return node.data.default
+  return SettingsStorage.get(setting, Settings.Layer.DEFAULT)
 end
 
 return module
