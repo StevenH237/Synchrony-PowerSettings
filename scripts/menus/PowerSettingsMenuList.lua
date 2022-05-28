@@ -92,6 +92,9 @@ local modify = {
   exitAction = function(arg)
     SettingsStorage.set(arg.id, arg.items, Settings.Layer.REMOTE_PENDING)
     Menu.close()
+    if arg.node.refreshOnChange then
+      Menu.update()
+    end
   end
 }
 

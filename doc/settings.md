@@ -7,6 +7,7 @@ But the main draw of Power Settings is its expanded settings types and options.
 ## Global options
 * **`basicName`**: `string` - The name used on an option when basic settings are enabled.
 * **`ignoredIf`**: `bool` or `function` - The condition under which a setting should be ignored (`PowerSettings.get()` returns default value). If not specified, invisible settings are ignored. If `false`, the value is not ignored even if the setting is invisible.
+* **`refreshOnChange`**: `bool` - If true, changing the value causes a `Menu.update()`.
 * **`visibleIf`**: `function` - Whether or not the setting should be visible. If not specified, defaults to showing.
 
 ## `number` options

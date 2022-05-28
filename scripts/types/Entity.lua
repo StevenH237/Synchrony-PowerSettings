@@ -50,7 +50,12 @@ function module.action(id)
   local node = PSStorage.get(id).data
 
   Menu.open("PowerSettings_entitySearch", {
-    callback = function(value) SettingsStorage.set(id, value, Settings.Layer.REMOTE_PENDING) end,
+    callback = function(value)
+      SettingsStorage.set(id, value, Settings.Layer.REMOTE_PENDING)
+      if node.refreshOnChange then
+        Menu.update()
+      end
+    end,
     label = node.name,
     list = node.entities,
     node = node,

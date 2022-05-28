@@ -25,6 +25,13 @@ local function labelBit(node, name, ind)
   return out
 end
 
+local function finish(refresh)
+  Menu.close()
+  if refresh then
+    Menu.update()
+  end
+end
+
 Event.menu.add("menuBitflag", "PowerSettings_bitflag", function(ev)
   ev.menu = {}
   local entries = {}
@@ -58,12 +65,12 @@ Event.menu.add("menuBitflag", "PowerSettings_bitflag", function(ev)
 
   table.insert(entries, { height = 0 })
   table.insert(entries, {
-    action=Menu.close,
+    action = function() finish(data.refreshOnChange) end,
     id = "_done",
     label = "Done",
     sound = "UIBack"
   })
 
   ev.menu.entries = entries
-  ev.menu.escapeAction = Menu.close
+  ev.menu.escapeAction = function() finish(data.refreshOnChange) end
 end)
