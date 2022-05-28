@@ -56,12 +56,12 @@ Event.menu.add("menuBitflag", "PowerSettings_bitflag", function(ev)
     ::nextBit::
   end
 
-  table.insert(entries, {height=0})
+  table.insert(entries, { height = 0 })
   table.insert(entries, {
     action=Menu.close,
-    id="_done",
-    label="Done",
-    sound="UIBack"
+    id = "_done",
+    label = "Done",
+    sound = "UIBack"
   })
 
   ev.menu.entries = entries

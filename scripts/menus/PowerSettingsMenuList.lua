@@ -111,7 +111,7 @@ local organize = {
     if arg.selected ~= 1 then
       local items = arg.items
       local sel = arg.selected
-      items[sel], items[sel-1] = items[sel-1], items[sel]
+      items[sel], items[sel - 1] = items[sel - 1], items[sel]
       arg.selected = sel - 1
       Menu.update()
       Menu.selectByID(arg.id .. "." .. arg.selected)
@@ -121,7 +121,7 @@ local organize = {
     if arg.selected ~= #arg.items then
       local items = arg.items
       local sel = arg.selected
-      items[sel], items[sel+1] = items[sel+1], items[sel]
+      items[sel], items[sel + 1] = items[sel + 1], items[sel]
       arg.selected = sel + 1
       Menu.update()
       Menu.selectByID(arg.id .. "." .. arg.selected)
@@ -151,7 +151,7 @@ local organize = {
 }
 
 local function addItem(arg, select)
-  arg.items[#arg.items+1] = getDefault(arg)
+  arg.items[#arg.items + 1] = getDefault(arg)
   if select or #arg.items == arg.node.data.limit then
     arg.selected = #arg.items
     Menu.update()
@@ -182,11 +182,11 @@ Event.menu.add("menuList", "PowerSettings_list", function(ev)
 
   for i = 1, #items do
     local entry = {
-      id=arg.id .. "." .. i,
-      label=function() return node.data.itemFormat(items[i]) end,
+      id = arg.id .. "." .. i,
+      label = function() return node.data.itemFormat(items[i]) end,
     }
 
-    entries[#entries+1] = entry
+    entries[#entries + 1] = entry
 
     if arg.mode == PSList.Mode.MODIFY then
       if PSList[itemType].leftAction then entry.leftAction = function() PSList[itemType].leftAction(arg) end end
@@ -219,35 +219,35 @@ Event.menu.add("menuList", "PowerSettings_list", function(ev)
   end
 
   if #items > 0 then
-    entries[#entries+1] = {height=0}
+    entries[#entries + 1] = { height = 0 }
   end
 
   if #items ~= node.data.limit then
     -- "Add item" entry
-    entries[#entries+1] = {
-      label="+ Add",
-      action=function() addItem(arg, true) end,
-      specialAction=function() addItem(arg, false) end,
-      id=arg.id .. ".add",
-      downAction=function() modify.downAction(arg) end,
-      upAction=function() modify.upAction(arg) end
+    entries[#entries + 1] = {
+      label = "+ Add",
+      action = function() addItem(arg, true) end,
+      specialAction = function() addItem(arg, false) end,
+      id = arg.id .. ".add",
+      downAction = function() modify.downAction(arg) end,
+      upAction = function() modify.upAction(arg) end
     }
 
-    entries[#entries+1] = {height=0}
+    entries[#entries + 1] = { height = 0 }
   end
 
-  entries[#entries+1] = {
-    label="Done",
-    action=function() modify.exitAction(arg) end,
-    id=arg.id .. ".done",
-    downAction=function() modify.downAction(arg) end,
-    upAction=function() modify.upAction(arg) end
+  entries[#entries + 1] = {
+    label = "Done",
+    action = function() modify.exitAction(arg) end,
+    id = arg.id .. ".done",
+    downAction = function() modify.downAction(arg) end,
+    upAction = function() modify.upAction(arg) end
   }
 
   if arg.mode == PSList.Mode.MODIFY then
-    menu.escapeAction=function() modify.exitAction(arg) end
+    menu.escapeAction = function() modify.exitAction(arg) end
   else
-    menu.escapeAction=function() organize.escapeAction(arg) end
+    menu.escapeAction = function() organize.escapeAction(arg) end
   end
 
   menu.entries = entries

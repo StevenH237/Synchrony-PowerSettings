@@ -29,7 +29,6 @@ end
 Event.menu.add("menuComponentSearch", "PowerSettings_componentSearch", function(ev)
   local menu = {}
   local entries = {}
-  local advanced = SettingsStorage.get("config.showAdvanced")
 
   local components = ev.arg.list
   local query = ev.arg.query

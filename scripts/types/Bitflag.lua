@@ -96,8 +96,7 @@ function module.leftAction(id)
   local B = nil
 
   for k, C in pairs(presets) do
-    if
-      B == nil or (B < A and C < A and C > B) or (B >= A and (C > B or C < A))
+    if B == nil or (B < A and C < A and C > B) or (B >= A and (C > B or C < A))
     then
       B = C
     end
@@ -114,8 +113,7 @@ function module.rightAction(id)
   local B = nil
 
   for k, C in pairs(presets) do
-    if
-      B == nil or (B > A and C > A and C < B) or (B <= A and (C < B or C > A))
+    if B == nil or (B > A and C > A and C < B) or (B <= A and (C < B or C > A))
     then
       B = C
     end
