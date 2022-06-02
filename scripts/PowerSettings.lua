@@ -55,8 +55,18 @@ function module.reset(prefix)
   end
 end
 
+function module.getIgnored(data)
+  if data.ignoredIsNil then
+    return nil
+  elseif data.ignored ~= nil then
+    return data.ignoredValue
+  else
+    return data.default
+  end
+end
+
 function module.get(setting, layers)
-  layers = layers or { Settings.Layer.REMOTE_PENDING, Settings.Layer.REMOTE_OVERRIDE }
+  layers = layers or { Settings.Layer.REMOTE_PENDING, Settings.Layer.REMOTE_OVERRIDE, Settings.Layer.DEFAULT }
 
   -- Do we have an ignore condition?
   local node = PSStorage.get(setting)
@@ -66,23 +76,35 @@ function module.get(setting, layers)
     -- If it exists and is true, return the default value.
     if type(ignoredIf) == "function" then
       if ignoredIf() then
-        return node.data.default
+        return module.getIgnored(node.data)
       end
     elseif type(ignoredIf) == "bool" then
       -- This mostly exists to allow "ignoredIf=false" so that an invisible setting still affects the gameplay.
       if ignoredIf then
-        return node.data.default
+        return module.getIgnored(node.data)
       end
     elseif type(visibleIf) == "function" then
       -- Do we have a visibility condition?
       -- If so and it's *false*, return the default value.
       if not visibleIf() then
-        return node.data.default
+        return module.getIgnored(node.data)
       end
     end
   end
 
   -- Otherwise try grabbing it by the layers.
+  for i, layer in ipairs(layers) do
+    local try = SettingsStorage.get(setting, layer)
+    if try ~= nil then return try end
+  end
+
+  return SettingsStorage.get(setting, Settings.Layer.DEFAULT)
+end
+
+function module.getRaw(setting, layers)
+  layers = layers or { Settings.Layer.REMOTE_PENDING, Settings.Layer.REMOTE_OVERRIDE, Settings.Layer.DEFAULT }
+
+  -- Try grabbing it by the layers.
   for i, layer in ipairs(layers) do
     local try = SettingsStorage.get(setting, layer)
     if try ~= nil then return try end
