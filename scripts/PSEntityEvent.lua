@@ -17,7 +17,7 @@ function module.addc(args)
   componentSettings[#componentSettings + 1] = args
 end
 
-Event.ecsSchemaReloaded.add("entitySettings", { order = "updateECS", sequence = 1 }, function(ev)
+Event.ecsSchemaReloaded.add("entitySettings", { order = "updateECS", sequence = 1000 }, function(ev)
   for i, v in ipairs(entitySettings) do
     v.entities = PSEntity.getFilteredEntities(v.filter)
   end
