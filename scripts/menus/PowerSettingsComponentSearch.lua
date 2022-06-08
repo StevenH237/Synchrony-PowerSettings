@@ -16,7 +16,7 @@ local function searchKeystroke(arg, key)
   if key == nil then
     arg.query = string.sub(arg.query, 1, -2)
   else
-    arg.query = arg.query .. string.char(key)
+    arg.query = arg.query .. key
   end
   Menu.update()
 end
