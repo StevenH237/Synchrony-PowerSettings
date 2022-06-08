@@ -54,6 +54,12 @@ local function addActionFunctions(v, addedFunction)
   end
 end
 
+local function getSelectFunction(string)
+  return function()
+    Menu.selectByID(string)
+  end
+end
+
 Event.menu.override("settings", 1, function(func, ev)
   func(ev)
 
@@ -154,18 +160,26 @@ Event.menu.override("settings", 1, function(func, ev)
         end
 
       elseif node.sType == "header" then
+        print("Header node loaded: " .. v.id)
         v.action = nil
 
+        v.func = getSelectFunction(v.id)
+
         if firstHeader == nil then
+          print("No headers yet")
           firstHeader = v
           lastHeader = v
         end
 
-        firstHeader.leftAction = function() Menu.selectByID(v.id) end --First+left selects this
         ---@diagnostic disable-next-line: need-check-nil
-        v.rightAction = function() Menu.selectByID(firstHeader.id) end --This+right selects first
-        lastHeader.rightAction = function() Menu.selectByID(v.id) end --Last+right selects this
-        v.leftAction = function() Menu.selectByID(lastHeader.id) end --This+left selects last
+        print("First header: " .. firstHeader.id)
+        print("Last header: " .. lastHeader.id)
+
+        firstHeader.leftAction = v.func --First+left selects this
+        ---@diagnostic disable-next-line: need-check-nil
+        v.rightAction = firstHeader.func --This+right selects first
+        lastHeader.rightAction = v.func --Last+right selects this
+        v.leftAction = lastHeader.func --This+left selects last
 
         lastHeader = v
 
@@ -231,5 +245,7 @@ Event.menu.override("settings", 1, function(func, ev)
       i = i + 1
       ::notNode::
     end
+
+    print(ev)
   end
 end)

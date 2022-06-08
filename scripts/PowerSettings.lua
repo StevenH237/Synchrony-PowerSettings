@@ -7,6 +7,7 @@ local PSStorage    = require "PowerSettings.PSStorage"
 local PSTBitflag   = require "PowerSettings.types.Bitflag"
 local PSTComponent = require "PowerSettings.types.Component"
 local PSTEntity    = require "PowerSettings.types.Entity"
+local PSTHeader    = require "PowerSettings.types.Header"
 local PSTLabel     = require "PowerSettings.types.Label"
 local PSTList      = require "PowerSettings.types.List"
 local PSTNumber    = require "PowerSettings.types.Number"
@@ -36,6 +37,7 @@ for _, v in ipairs({ "shared", "entitySchema" }) do
   module[v].time = function(args) return PSTNumber.setting(v, "time", args) end
   module[v].label = function(args) return PSTLabel.setting(v, args) end
   module[v].preset = function(args) return PSTPreset.setting(v, args) end
+  module[v].header = function(args) return PSTHeader.setting(v, args) end
   module[v].list = {}
 
   for _, t in ipairs({ "string", "number", "enum", "entity", "component" }) do
