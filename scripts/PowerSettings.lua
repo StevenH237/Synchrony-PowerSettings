@@ -3,16 +3,17 @@ local SettingsStorage = require "necro.config.SettingsStorage"
 
 local NixLib = require "NixLib.NixLib"
 
-local PSMain       = require "PowerSettings.PSMain"
-local PSStorage    = require "PowerSettings.PSStorage"
-local PSTBitflag   = require "PowerSettings.types.Bitflag"
-local PSTComponent = require "PowerSettings.types.Component"
-local PSTEntity    = require "PowerSettings.types.Entity"
-local PSTHeader    = require "PowerSettings.types.Header"
-local PSTLabel     = require "PowerSettings.types.Label"
-local PSTList      = require "PowerSettings.types.List"
-local PSTNumber    = require "PowerSettings.types.Number"
-local PSTPreset    = require "PowerSettings.types.Preset"
+local PSMain        = require "PowerSettings.PSMain"
+local PSStorage     = require "PowerSettings.PSStorage"
+local PSTBitflag    = require "PowerSettings.types.Bitflag"
+local PSTComponent  = require "PowerSettings.types.Component"
+local PSTEntity     = require "PowerSettings.types.Entity"
+local PSTHeader     = require "PowerSettings.types.Header"
+local PSTLabel      = require "PowerSettings.types.Label"
+local PSTList       = require "PowerSettings.types.List"
+local PSTMultiLabel = require "PowerSettings.types.MultiLabel"
+local PSTNumber     = require "PowerSettings.types.Number"
+local PSTPreset     = require "PowerSettings.types.Preset"
 
 local module = {}
 
@@ -43,6 +44,7 @@ for _, v in ipairs({ "shared", "entitySchema" }) do
   module[v].percent = function(args) autoRegister(args) return PSTNumber.setting(v, "percent", args) end
   module[v].time = function(args) autoRegister(args) return PSTNumber.setting(v, "time", args) end
   module[v].label = function(args) autoRegister(args) return PSTLabel.setting(v, args) end
+  module[v].multiLabel = function(args) autoRegister(args) return PSTMultiLabel.setting(v, args) end
   module[v].preset = function(args) autoRegister(args) return PSTPreset.setting(v, args) end
   module[v].header = function(args) autoRegister(args) return PSTHeader.setting(v, args) end
   module[v].list = {}
@@ -53,6 +55,7 @@ for _, v in ipairs({ "shared", "entitySchema" }) do
 end
 
 function module.group(args)
+  autoRegister(args)
   PSStorage.add("group", args)
   return Settings.group(args)
 end
