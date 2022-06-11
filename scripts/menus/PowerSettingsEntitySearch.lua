@@ -72,6 +72,4 @@ Event.menu.add("menuEntitySearch", "PowerSettings_entitySearch", function(ev)
   menu.label = "Select entity"
 
   ev.menu = menu
-
-  print(ev)
 end)

@@ -19,7 +19,8 @@ end
 function module.action(id)
   Menu.open("PowerSettings_list", {
     id = id,
-    items = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or Utilities.fastCopy(SettingsStorage.getDefaultValue(id)),
+    items = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or
+        Utilities.fastCopy(SettingsStorage.getDefaultValue(id)),
     mode = module.Mode.MODIFY,
     node = PSStorage.get(id)
   })
@@ -76,7 +77,8 @@ local function numberEditAsString(arg, key)
     if not (string.find(value, ".", 1, true) or string.find(value, "e", 1, true) or string.find(value, "x", 1, true)) then
       value = value .. "."
     end
-  elseif key == "0" or key == "1" or key == "2" or key == "3" or key == "4" or key == "5" or key == "6" or key == "7" or key == "8" or key == "9" then
+  elseif key == "0" or key == "1" or key == "2" or key == "3" or key == "4" or key == "5" or key == "6" or key == "7" or
+      key == "8" or key == "9" then
     -- numbers are always allowed
     value = value .. key
   elseif ({ ["a"] = true, ["b"] = true, ["c"] = true, ["d"] = true, ["f"] = true })[key:lower()] then
@@ -132,7 +134,6 @@ module.number = {
   leftAction = function(arg)
     local value = arg.items[arg.selected]
     local lower = value - (arg.node.data.step or 1)
-    print({ value, lower, arg.node.data.step })
     if arg.node.data.minimum and lower < arg.node.data.minimum then lower = arg.node.data.minimum end
     arg.items[arg.selected] = lower
   end,
