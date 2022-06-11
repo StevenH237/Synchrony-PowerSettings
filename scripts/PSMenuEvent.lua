@@ -185,19 +185,24 @@ Event.menu.override("settings", 1, function(func, ev)
 
         -- Setting type "label"
       elseif node.sType == "label" then
-        v.action = nil
-        v.textEntry = nil
-        v.textEntryToggle = nil
-        v.leftAction = nil
-        v.rightAction = nil
-        v.specialAction = nil
-        if not node.data.large then
-          v.font = {
-            fillColor = -1,
-            font = "gfx/necro/font/necrosans-6.png;",
-            shadowColor = -16777216,
-            size = 6
-          }
+        if ev.searchText then
+          table.remove(entries, i)
+          goto notNode
+        else
+          v.action = nil
+          v.textEntry = nil
+          v.textEntryToggle = nil
+          v.leftAction = nil
+          v.rightAction = nil
+          v.specialAction = nil
+          if not node.data.large then
+            v.font = {
+              fillColor = -1,
+              font = "gfx/necro/font/necrosans-6.png;",
+              shadowColor = -16777216,
+              size = 6
+            }
+          end
         end
 
         -- Setting type "list.*"
@@ -238,7 +243,9 @@ Event.menu.override("settings", 1, function(func, ev)
       -- Code for basic settings
       if not SettingsStorage.get("config.showAdvanced") then
         if data.basicName then
-          v.label = function() return data.basicName .. ": " .. SettingsStorage.getFormattedValue(v.id, SettingsStorage.get(v.id, Settings.Layer.REMOTE_PENDING)) end
+          v.label = function() return data.basicName ..
+                ": " .. SettingsStorage.getFormattedValue(v.id, SettingsStorage.get(v.id, Settings.Layer.REMOTE_PENDING))
+          end
         end
       end
 
@@ -246,6 +253,6 @@ Event.menu.override("settings", 1, function(func, ev)
       ::notNode::
     end
 
-    print(ev)
+    -- print(ev)
   end
 end)
