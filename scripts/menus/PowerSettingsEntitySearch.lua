@@ -29,60 +29,49 @@ end
 Event.menu.add("menuEntitySearch", "PowerSettings_entitySearch", function(ev)
   local menu = {}
   local entries = {}
-  local advanced = SettingsStorage.get("config.showAdvanced")
 
   local entities = ev.arg.list
-  local query = ev.arg.query
-
-  local filtered = {}
 
   for i, v in ipairs(entities) do
-    local vl = v:lower()
-    local n = query:lower()
-    local iStart, iEnd = vl:find(n, 1, true)
-
-    if iStart then
-      table.insert(filtered, { v, iStart, iEnd })
-    end
+    table.insert(entries, {
+      id = "result." .. v,
+      label = v,
+      action = function() resultAction(v, ev.arg.callback) end
+    })
   end
 
-  menu.label = ev.arg.label
+  if ev.searchText == nil then
+    table.insert(entries, 1, {
+      label = "Press Ctrl+F to search!",
+      font = {
+        fillColor = -1,
+        font = "gfx/necro/font/necrosans-6.png;",
+        shadowColor = -16777216,
+        size = 6
+      }
+    })
 
-  entries[1] = {
-    id = "searchbox",
-    label = function() return searchLabel(query) end,
-    textEntry = function(key) searchKeystroke(ev.arg, key) end,
-    textEntryToggle = function(active, confirm) end,
-    specialAction = function() searchSpecialAction(ev.arg) end
-  }
-
-  entries[2] = {
-    height = 1
-  }
-
-  if #filtered > 0 then
-    for i, v in ipairs(filtered) do
-      local entry = {}
-      entry.id = "result." .. v[1]
-      entry.label = string.sub(v[1], 1, v[2] - 1)
-          .. "\3*cc5" .. string.sub(v[1], v[2], v[3])
-          .. "\3r" .. string.sub(v[1], v[3] + 1, -1)
-      entry.action = function() resultAction(v[1], ev.arg.callback) end
-      entry.specialAction = function() Menu.selectByID("searchbox") end
-      entries[2 + i] = entry
-    end
+    table.insert(entries, 2, {
+      height = 0
+    })
 
     entries[#entries + 1] = {
-      height = 1
+      height = 0
+    }
+
+    entries[#entries + 1] = {
+      id = "cancel",
+      label = "Cancel",
+      action = Menu.close
     }
   end
 
-  entries[#entries + 1] = {
-    id = "cancel",
-    label = "Cancel",
-    action = Menu.close
-  }
-
   menu.entries = entries
+  menu.searchable = true
+
+  menu.label = "Select entity"
+
   ev.menu = menu
+
+  print(ev)
 end)
