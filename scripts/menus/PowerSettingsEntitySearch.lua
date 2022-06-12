@@ -1,25 +1,9 @@
-local Event           = require "necro.event.Event"
-local Menu            = require "necro.menu.Menu"
-local SettingsStorage = require "necro.config.SettingsStorage"
+local Event = require "necro.event.Event"
+local Menu  = require "necro.menu.Menu"
 
-local function searchLabel(value)
-  if value ~= "" then return value
-  else return "(Search...)" end
-end
+local KeyBank = require "PowerSettings.i18n.KeyBank"
 
-local function searchSpecialAction(arg)
-  arg.query = ""
-  Menu.update()
-end
-
-local function searchKeystroke(arg, key)
-  if key == nil then
-    arg.query = string.sub(arg.query, 1, -2)
-  else
-    arg.query = arg.query .. key
-  end
-  Menu.update()
-end
+local NKeyBank = require "NixLib.i18n.KeyBank"
 
 local function resultAction(value, callback)
   Menu.close()
@@ -42,7 +26,7 @@ Event.menu.add("menuEntitySearch", "PowerSettings_entitySearch", function(ev)
 
   if ev.searchText == nil then
     table.insert(entries, 1, {
-      label = "Press Ctrl+F to search!",
+      label = KeyBank.SearchHint,
       font = {
         fillColor = -1,
         font = "gfx/necro/font/necrosans-6.png;",
@@ -61,7 +45,7 @@ Event.menu.add("menuEntitySearch", "PowerSettings_entitySearch", function(ev)
 
     entries[#entries + 1] = {
       id = "cancel",
-      label = "Cancel",
+      label = NKeyBank.Cancel,
       action = Menu.close
     }
   end

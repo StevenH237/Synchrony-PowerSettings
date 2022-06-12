@@ -6,6 +6,8 @@ local SettingsStorage = require "necro.config.SettingsStorage"
 local PSList    = require "PowerSettings.types.List"
 local PSStorage = require "PowerSettings.PSStorage"
 
+local NKeyBank = require "NixLib.i18n.KeyBank"
+
 --[[
   List arg parameters:
   id = (string) The ID of the setting
@@ -15,16 +17,6 @@ local PSStorage = require "PowerSettings.PSStorage"
   start = (int|nil) The index at which the selected item started
   text = (string|nil) The text currently being edited
 ]]
-
-local function labelControls(mode)
-  if mode == PSList.Mode.MODIFY then
-    return "Press TAB to move or delete this item"
-  elseif mode == PSList.Mode.ORGANIZE then
-    return "Left: Delete | Up/Down: Move | Right: Insert above | Tab: Finish moving | Esc: Cancel move"
-  else
-    return ""
-  end
-end
 
 local function getDefault(arg)
   local default = arg.node.data.itemDefault
@@ -228,7 +220,7 @@ Event.menu.add("menuList", "PowerSettings_list", function(ev)
   if #items ~= node.data.limit then
     -- "Add item" entry
     entries[#entries + 1] = {
-      label = "+ Add",
+      label = L("+ Add", "addItem"),
       action = function() addItem(arg, true) end,
       specialAction = function() addItem(arg, false) end,
       id = arg.id .. ".add",
@@ -240,7 +232,7 @@ Event.menu.add("menuList", "PowerSettings_list", function(ev)
   end
 
   entries[#entries + 1] = {
-    label = "Done",
+    label = NKeyBank.Done,
     action = function() modify.exitAction(arg) end,
     id = arg.id .. ".done",
     downAction = function() modify.downAction(arg) end,

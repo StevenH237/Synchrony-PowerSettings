@@ -1,6 +1,10 @@
 local Event = require "necro.event.Event"
 local Menu  = require "necro.menu.Menu"
 
+local KeyBank = require "PowerSettings.i18n.KeyBank"
+
+local NKeyBank = require "NixLib.i18n.KeyBank"
+
 local function resultAction(value, callback)
   Menu.close()
   callback(value)
@@ -22,7 +26,7 @@ Event.menu.add("menuComponentSearch", "PowerSettings_componentSearch", function(
 
   if ev.searchText == nil then
     table.insert(entries, 1, {
-      label = "Press Ctrl+F to search!",
+      label = KeyBank.SearchHint,
       font = {
         fillColor = -1,
         font = "gfx/necro/font/necrosans-6.png;",
@@ -41,12 +45,12 @@ Event.menu.add("menuComponentSearch", "PowerSettings_componentSearch", function(
 
     entries[#entries + 1] = {
       id = "cancel",
-      label = "Cancel",
+      label = NKeyBank.Cancel,
       action = Menu.close
     }
   end
 
-  menu.label = "Select component"
+  menu.label = L("Select component", "selectComponent")
 
   menu.entries = entries
   menu.searchable = true

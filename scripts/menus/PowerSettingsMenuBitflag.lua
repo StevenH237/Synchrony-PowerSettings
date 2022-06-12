@@ -2,10 +2,12 @@ local Event           = require "necro.event.Event"
 local Menu            = require "necro.menu.Menu"
 local Settings        = require "necro.config.Settings"
 local SettingsStorage = require "necro.config.SettingsStorage"
+local TextFormat      = require "necro.config.i18n.TextFormat"
 
-local Bitflag   = require "PowerSettings.types.Bitflag"
 local EnumUtils = require "PowerSettings.EnumUtils"
 local PSStorage = require "PowerSettings.PSStorage"
+
+local NKeyBank = require "NixLib.i18n.KeyBank"
 
 local function flipBit(node, ind)
   local value = SettingsStorage.get(node, Settings.Layer.REMOTE_PENDING) or SettingsStorage.getDefaultValue(node)
@@ -13,13 +15,13 @@ local function flipBit(node, ind)
 end
 
 local function labelBit(node, name, ind)
-  local out = name .. ": "
+  local out = name .. " "
   local value = SettingsStorage.get(node, Settings.Layer.REMOTE_PENDING) or SettingsStorage.getDefaultValue(node)
 
   if bit.band(value, ind) ~= 0 then
-    out = out .. "\3*9e9On\3r"
+    out = out .. TextFormat.Symbol.CHECKBOX_ON
   else
-    out = out .. "\3*e99Off\3r"
+    out = out .. TextFormat.Symbol.CHECKBOX_OFF
   end
 
   return out
@@ -67,7 +69,7 @@ Event.menu.add("menuBitflag", "PowerSettings_bitflag", function(ev)
   table.insert(entries, {
     action = function() finish(data.refreshOnChange) end,
     id = "_done",
-    label = "Done",
+    label = NKeyBank.Done,
     sound = "UIBack"
   })
 

@@ -6,7 +6,7 @@
 	"description": "No description given.",
 	"author": "Nixill",
 	"dependencies": {
-		"NixLib": "1.3.0"
+		"NixLib": "1.4.0"
 	},
 	"api": {
 		"scriptPath": "scripts"

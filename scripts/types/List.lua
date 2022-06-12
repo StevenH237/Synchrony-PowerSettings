@@ -11,9 +11,10 @@ local PSStorage     = require "PowerSettings.PSStorage"
 local module = {}
 
 local function defaultListFormat(itemFormat, list)
-  if #list == 0 then return "Empty"
+  if #list == 0 then return L("Empty", "emptyList")
   elseif #list == 1 then return "{" .. itemFormat(list[1]) .. "}"
-  else return (#list) .. " items" end
+  elseif #list == 2 then return L("2 items", "twoItemList")
+  else return string.format(L("%d items", "manyItemList"), #list) end
 end
 
 function module.action(id)
@@ -252,7 +253,7 @@ module.entity = {
   action = function(arg)
     Menu.open("PowerSettings_entitySearch", {
       callback = function(value) arg.items[arg.selected] = value end,
-      label = arg.node.data.name .. " item",
+      label = string.format(L("%s item", "listItemName"), arg.node.data.name),
       list = arg.node.data.entities,
       node = arg.node.data,
       query = "",
@@ -300,7 +301,7 @@ module.component = {
   action = function(arg)
     Menu.open("PowerSettings_componentSearch", {
       callback = function(value) arg.items[arg.selected] = value end,
-      label = arg.node.data.name .. " item",
+      label = string.format(L("%s item", "listItemName"), arg.node.data.name),
       list = arg.node.data.components,
       node = arg.node.data,
       query = "",
