@@ -22,7 +22,7 @@ function module.format(value)
       return value
     end
   else
-    return string.format(L("(No such entity: %s)", "noSuchEntity"), value)
+    return L.formatKey("(No such entity: %s)", "noSuchEntity", value)
   end
 end
 

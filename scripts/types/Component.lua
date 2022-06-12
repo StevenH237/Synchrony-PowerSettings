@@ -16,7 +16,7 @@ function module.format(value)
   if component then
     return value
   else
-    return string.format(L("(No such component: %s)", "noSuchComponent"), value)
+    return L.formatKey("(No such component: %s)", "noSuchComponent", value)
   end
 end
 
