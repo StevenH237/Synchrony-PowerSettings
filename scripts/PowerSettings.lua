@@ -78,7 +78,11 @@ function module.getIgnored(data)
 end
 
 function module.get(setting, layers)
-  layers = layers or { Settings.Layer.REMOTE_PENDING, Settings.Layer.REMOTE_OVERRIDE, Settings.Layer.DEFAULT }
+  if type(layers) == "nil" then
+    layers = { Settings.Layer.REMOTE_PENDING, Settings.Layer.REMOTE_OVERRIDE, Settings.Layer.DEFAULT }
+  elseif type(layers) ~= "table" then
+    layers = { layers }
+  end
 
   -- Do we have an ignore condition?
   local node = PSStorage.get(setting)
@@ -114,7 +118,11 @@ function module.get(setting, layers)
 end
 
 function module.getRaw(setting, layers)
-  layers = layers or { Settings.Layer.REMOTE_PENDING, Settings.Layer.REMOTE_OVERRIDE, Settings.Layer.DEFAULT }
+  if type(layers) == "nil" then
+    layers = { Settings.Layer.REMOTE_PENDING, Settings.Layer.REMOTE_OVERRIDE, Settings.Layer.DEFAULT }
+  elseif type(layers) ~= "table" then
+    layers = { layers }
+  end
 
   -- Try grabbing it by the layers.
   for i, layer in ipairs(layers) do
