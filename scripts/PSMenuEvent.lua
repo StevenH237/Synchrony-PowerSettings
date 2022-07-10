@@ -166,7 +166,6 @@ Event.menu.override("settings", 1, function(func, ev)
       v.func = getSelectFunction(v.id)
 
       if firstHeader == nil then
-        print("No headers yet")
         firstHeader = v
         lastHeader = v
       end
@@ -247,6 +246,4 @@ Event.menu.override("settings", 1, function(func, ev)
     i = i + 1
     ::notNode::
   end
-
-  -- print(ev)
 end)

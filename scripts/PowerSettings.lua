@@ -79,7 +79,7 @@ end
 
 function module.get(setting, layers)
   if type(layers) == "nil" then
-    layers = { Settings.Layer.REMOTE_PENDING, Settings.Layer.REMOTE_OVERRIDE, Settings.Layer.DEFAULT }
+    layers = {}
   elseif type(layers) ~= "table" then
     layers = { layers }
   end
@@ -114,12 +114,12 @@ function module.get(setting, layers)
     if try ~= nil then return try end
   end
 
-  return SettingsStorage.get(setting, Settings.Layer.DEFAULT)
+  return SettingsStorage.get(setting)
 end
 
 function module.getRaw(setting, layers)
   if type(layers) == "nil" then
-    layers = { Settings.Layer.REMOTE_PENDING, Settings.Layer.REMOTE_OVERRIDE, Settings.Layer.DEFAULT }
+    layers = {}
   elseif type(layers) ~= "table" then
     layers = { layers }
   end
