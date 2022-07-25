@@ -88,21 +88,9 @@ function module.get(setting, layers)
   local node = PSStorage.get(setting)
   if node then
     local ignoredIf = node.data.ignoredIf
-    local visibleIf = node.data.visibleIf
     -- If it exists and is true, return the default value.
     if type(ignoredIf) == "function" then
       if ignoredIf() then
-        return module.getIgnored(node.data)
-      end
-    elseif type(ignoredIf) == "bool" then
-      -- This mostly exists to allow "ignoredIf=false" so that an invisible setting still affects the gameplay.
-      if ignoredIf then
-        return module.getIgnored(node.data)
-      end
-    elseif type(visibleIf) == "function" then
-      -- Do we have a visibility condition?
-      -- If so and it's *false*, return the default value.
-      if not visibleIf() then
         return module.getIgnored(node.data)
       end
     end
@@ -130,7 +118,7 @@ function module.getRaw(setting, layers)
     if try ~= nil then return try end
   end
 
-  return SettingsStorage.get(setting, Settings.Layer.DEFAULT)
+  return SettingsStorage.get(setting)
 end
 
 function module.autoRegister()
