@@ -5,20 +5,16 @@
 	"synchronyVersion": "3.1.0",
 	"description": "Advanced library for mod settings.",
 	"author": "Nixill",
-	"dependencies": {
-		"NixLib_io_2237103": "2.0.1"
-	},
-	"api": {
-		"scriptPath": "scripts"
-	},
+	"dependencies": {"NixLib_io_2237103":"2.0.1"},
+	"api": {"scriptPath":"scripts"},
 	"icon": "PowerSettingsIcon.png",
 	"banner": "PowerSettingsBanner.png",
 	"tags": [],
 	"name": "PowerSettings_io_2237104",
 	"changelog": "Dependency update",
-	"homepageURL": "https://crypt.mod.io/PowerSettings",
+	"homepageURL": "https://mod.io/g/crypt/m/PowerSettings",
 	"modioID": "2237104",
 	"modioUserID": 12939888,
-	"pendingVersion": "2.0.1",
-	"visibility": 2
+	"pendingVersion": "2.0.2",
+	"visibility": 0
 }
