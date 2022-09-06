@@ -8,7 +8,7 @@ local UI              = require "necro.render.UI"
 
 local PSList = require "PowerSettings.types.List"
 
-Event.renderUI.add("renderSettingsMenuOverlay", "menuOverlay", function ()
+Event.renderUI.add("renderSettingsMenuOverlay", "menuOverlay", function()
   if not Menu.getCurrent() or Menu.getCurrent().name ~= "PowerSettings_list" then
     return
   end
@@ -22,18 +22,20 @@ Event.renderUI.add("renderSettingsMenuOverlay", "menuOverlay", function ()
 
   local text
   if arg.selected == "add" then
-    text = ("Press '%s' to add without selecting the item"):format(Controls.getFriendlyMiscKeyBind(Controls.Misc.SELECT_2))
+    text = L("Press '%s' to add without selecting the item", "addWithoutSelecting"):format(Controls.
+      getFriendlyMiscKeyBind(Controls.Misc.SELECT_2))
   elseif arg.mode == PSList.Mode.MODIFY then
-    text = ("Press '%s' for additional options"):format(Controls.getFriendlyMiscKeyBind(Controls.Misc.SELECT_2))
+    text = L("Press '%s' for additional options", "additionalOptions"):format(Controls.getFriendlyMiscKeyBind(Controls.
+      Misc.SELECT_2))
   else
     if #arg.items == arg.node.data.limit then
-      text = ("'%s': End move | '%s': Delete | '%s'/'%s': Move"):format(
+      text = L("'%s': End move | '%s': Delete | '%s'/'%s': Move", "modifyNoInsert"):format(
         Controls.getFriendlyMiscKeyBind(Controls.Misc.SELECT_2),
         Controls.getFriendlyMiscKeyBind(Controls.Misc.MENU_LEFT),
         Controls.getFriendlyMiscKeyBind(Controls.Misc.MENU_UP),
         Controls.getFriendlyMiscKeyBind(Controls.Misc.MENU_DOWN))
     else
-      text = ("'%s': End move | '%s': Delete | '%s'/'%s': Move | '%s': Insert above"):format(
+      text = L("'%s': End move | '%s': Delete | '%s'/'%s': Move | '%s': Insert above", "modifyInsert"):format(
         Controls.getFriendlyMiscKeyBind(Controls.Misc.SELECT_2),
         Controls.getFriendlyMiscKeyBind(Controls.Misc.MENU_LEFT),
         Controls.getFriendlyMiscKeyBind(Controls.Misc.MENU_UP),

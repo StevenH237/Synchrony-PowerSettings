@@ -1,17 +1,20 @@
 {
-	"name": "PowerSettings",
+	"namespace": "PowerSettings",
 	"displayName": "Power Settings",
-	"version": "1.1.0",
-	"synchronyVersion": "0.54",
-	"description": "No description given.",
+	"version": "2.0.2",
+	"synchronyVersion": "3.1.0",
+	"description": "Advanced library for mod settings.",
 	"author": "Nixill",
-	"dependencies": {
-		"NixLib": "1.3.0"
-	},
-	"api": {
-		"scriptPath": "scripts"
-	},
+	"dependencies": {"NixLib_io_2237103":"2.0.1"},
+	"api": {"scriptPath":"scripts"},
 	"icon": "PowerSettingsIcon.png",
 	"banner": "PowerSettingsBanner.png",
-	"tags": []
+	"tags": [],
+	"name": "PowerSettings_io_2237104",
+	"changelog": "Dependency update",
+	"homepageURL": "https://mod.io/g/crypt/m/PowerSettings",
+	"modioID": "2237104",
+	"modioUserID": 12939888,
+	"pendingVersion": "2.0.2",
+	"visibility": 0
 }

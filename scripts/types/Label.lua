@@ -8,7 +8,7 @@ function module.setting(mode, args)
   args.action = function() end
   args.visibility = args.visibility or Settings.Visibility.VISIBLE
   PSStorage.add("label", args)
-  return Settings.shared.action(args)
+  return Settings[mode].action(args)
 end
 
 return module

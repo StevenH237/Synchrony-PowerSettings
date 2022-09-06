@@ -11,15 +11,17 @@ local PSStorage     = require "PowerSettings.PSStorage"
 local module = {}
 
 local function defaultListFormat(itemFormat, list)
-  if #list == 0 then return "Empty"
-  elseif #list == 1 then return "{" .. itemFormat(list[1]) .. "}"
-  else return (#list) .. " items" end
+  if #list == 0 then return L("Empty", "emptyList")
+  elseif #list == 1 then return string.format("{%s}", itemFormat(list[1]))
+  elseif #list == 2 then return L("2 items", "twoItemList")
+  else return L.formatKey("%d items", "manyItemList", #list) end
 end
 
 function module.action(id)
   Menu.open("PowerSettings_list", {
     id = id,
-    items = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or Utilities.fastCopy(SettingsStorage.getDefaultValue(id)),
+    items = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or
+        Utilities.fastCopy(SettingsStorage.getDefaultValue(id)),
     mode = module.Mode.MODIFY,
     node = PSStorage.get(id)
   })
@@ -61,16 +63,14 @@ local function numberEditAsString(arg, key)
   local value = arg.textEntry
   if not key then
     value = value:sub(1, -2)
-  elseif key == 45 then
-    -- key 45 is "-"
+  elseif key == "-" then
     -- there are two cases when it's allowed:
     -- • at the very start of a number, OR
     -- • immediately after an `e` in a non-hexadecimal number
     if value == "" or (value:sub(-1) == "e" and not value:find("x", 1, true)) then
       value = value .. "-"
     end
-  elseif key == 46 then
-    -- key 46 is "."
+  elseif key == "." then
     -- a decimal point is only allowed when:
     -- • the number is not hexadecimal, AND
     -- • the number doesn't already have a decimal portion, AND
@@ -78,38 +78,30 @@ local function numberEditAsString(arg, key)
     if not (string.find(value, ".", 1, true) or string.find(value, "e", 1, true) or string.find(value, "x", 1, true)) then
       value = value .. "."
     end
-  elseif key >= 48 and key <= 57 then
-    -- keys 48-57 are numbers
-    -- they're always allowed
-    value = value .. string.char(key)
-  else
-    if key >= 65 and key <= 90 then
-      -- keys 65 to 90 are uppercase letters
-      key = key + 32
+  elseif key == "0" or key == "1" or key == "2" or key == "3" or key == "4" or key == "5" or key == "6" or key == "7" or
+      key == "8" or key == "9" then
+    -- numbers are always allowed
+    value = value .. key
+  elseif ({ ["a"] = true, ["b"] = true, ["c"] = true, ["d"] = true, ["f"] = true })[key:lower()] then
+    -- "abcdf"
+    -- allowed only in hexadecimal numbers
+    if value:find("x", 1, true) then
+      value = value .. key:lower()
     end
-
-    if key >= 97 and key <= 102 and key ~= 101 then
-      -- "abcdf"
-      -- allowed only in hexadecimal numbers
-      if value:find("x", 1, true) then
-        value = value .. string.char(key)
-      end
-    elseif key == 101 then
-      -- "e"
-      -- allowed under two conditions:
-      -- • the number is hexadecimal, OR
-      -- • the number doesn't contain an exponential portion
-      if value:find("x", 1, true) or not value:find("e", 1, true) then
-        value = value .. "e"
-      end
-    elseif key == 120 then
-      -- "x"
-      -- allowed only under two conditions:
-      -- • the number is exactly "0", OR
-      -- • the number is empty
-      if value == "" or value == "0" then
-        value = "0x"
-      end
+  elseif key == "E" or key == "e" then
+    -- allowed under two conditions:
+    -- • the number is hexadecimal, OR
+    -- • the number doesn't contain an exponential portion
+    if value:find("x", 1, true) or not value:find("e", 1, true) then
+      value = value .. "e"
+    end
+  elseif key == "X" or key == "x" then
+    -- "x"
+    -- allowed only under two conditions:
+    -- • the number is exactly "0", OR
+    -- • the number is empty
+    if value == "" or value == "0" then
+      value = "0x"
     end
   end
   arg.textEntry = value
@@ -143,7 +135,6 @@ module.number = {
   leftAction = function(arg)
     local value = arg.items[arg.selected]
     local lower = value - (arg.node.data.step or 1)
-    print({ value, lower, arg.node.data.step })
     if arg.node.data.minimum and lower < arg.node.data.minimum then lower = arg.node.data.minimum end
     arg.items[arg.selected] = lower
   end,
@@ -262,7 +253,7 @@ module.entity = {
   action = function(arg)
     Menu.open("PowerSettings_entitySearch", {
       callback = function(value) arg.items[arg.selected] = value end,
-      label = arg.node.data.name .. " item",
+      label = L.formatKey("%s item", "listItemName", arg.node.data.name),
       list = arg.node.data.entities,
       node = arg.node.data,
       query = "",
@@ -310,7 +301,7 @@ module.component = {
   action = function(arg)
     Menu.open("PowerSettings_componentSearch", {
       callback = function(value) arg.items[arg.selected] = value end,
-      label = arg.node.data.name .. " item",
+      label = L.formatKey("%s item", "listItemName", arg.node.data.name),
       list = arg.node.data.components,
       node = arg.node.data,
       query = "",

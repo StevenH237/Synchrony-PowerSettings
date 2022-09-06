@@ -21,9 +21,11 @@ function module.format(value, presets)
 
   local split = NixLib.bitSplit(value)
 
-  if #split == 0 then return "No flags enabled"
-  elseif #split == 1 then return "1 flag (0x" .. hex .. ")"
-  else return (#split) .. " flags (0x" .. hex .. ")" end
+  if #split == 0 then return L("No flags enabled", "formatNoFlags")
+  elseif #split == 1 then return L.formatKey("1 flag (%s)", "formatOneFlag", "0x" .. hex)
+  elseif #split == 2 then return L.formatKey("2 flags (%s)", "formatTwoFlags", "0x" .. hex)
+  else return L.formatKey("%i flags (%s)", "formatManyFlags", #split, "0x" .. hex) end
+  -- else return (#split) .. " flags (0x" .. hex .. ")" end
 end
 
 function module.getFlags(id)
@@ -50,8 +52,8 @@ function module.getFlags(id)
     if v then
       local hex = bit.tohex(k, 8)
       hex = hex:sub(hex:find("[123456789abcdef]", 1, false), -1)
-      flags["Unnamed bit 0x" .. hex] = k
-      flags.names[k] = "Unnamed bit"
+      flags[L.formatKey("Unnamed bit %s", "unnamedBitDetail", "0x" .. hex)] = k
+      flags.names[k] = L("Unnamed bit", "unnamedBit")
     end
   end
 
