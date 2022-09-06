@@ -125,4 +125,27 @@ function module.autoRegister()
   PSMain.setAutoRegister(true)
 end
 
+-- Backwards compatibility with vanilla Settings
+module.shared.group = module.group
+module.entitySchema.group = module.group
+
+for _, v in ipairs({ "Scope", "Type", "Visibility", "Tag", "Layer" }) do
+  module[v] = Settings[v]
+end
+
+-- And explain the intentional lack of backwards compatibility:
+local moduleMeta = {}
+
+function moduleMeta.index(table, key)
+  if key == "overridable" then
+    error(L("PowerSettings does not support overridable settings (yet!). You'll need to use regular Settings for those."
+      , "overridableError"))
+  elseif key == "user" then
+    error(L("PowerSettings does not support user settings (yet!). You'll need to use regular Settings for those.",
+      "userError"))
+  end
+end
+
+setmetatable(module, moduleMeta)
+
 return module

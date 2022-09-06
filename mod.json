@@ -1,12 +1,16 @@
 {
 	"namespace": "PowerSettings",
 	"displayName": "Power Settings",
-	"version": "2.0.2",
+	"version": "2.1.0",
 	"synchronyVersion": "3.1.0",
 	"description": "Advanced library for mod settings.",
 	"author": "Nixill",
-	"dependencies": {"NixLib_io_2237103":"2.0.1"},
-	"api": {"scriptPath":"scripts"},
+	"dependencies": {
+		"NixLib_io_2237103": "2.0.1"
+	},
+	"api": {
+		"scriptPath": "scripts"
+	},
 	"icon": "PowerSettingsIcon.png",
 	"banner": "PowerSettingsBanner.png",
 	"tags": [],
