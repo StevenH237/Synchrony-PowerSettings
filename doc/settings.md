@@ -6,10 +6,10 @@ But the main draw of Power Settings is its expanded settings types and options.
 
 ## Global options
 * **`basicName`**: `string` - The name used on an option when basic settings are enabled.
-* **`ignoredIf`**: `bool` or `function` - The condition under which a setting should be ignored (`PowerSettings.get()` returns default value). If not specified, invisible settings are ignored. If `false`, the value is not ignored even if the setting is invisible.
+* **`ignoredIf`**: `bool` or `function` - The condition under which a setting should be ignored (`PowerSettings.get()` returns default value). If not specified, the setting is never ignored.
 * **`ignoredIsNil`**: `bool` - If true, returns `nil` instead of the default value when the setting is ignored.
 * **`ignoredValue`**: `any` - If not nil, this value is returned instead of the default value when the setting is ignored.
-* **`refreshOnChange`**: `bool` - If true, changing the value causes a `Menu.update()`.
+* **`refreshOnChange`**: `bool` - If true, changing the value causes a `Menu.update()`. *This doesn't seem to be working in recent Synchrony versions.*
 * **`visibleIf`**: `function` - Whether or not the setting should be visible. If not specified, defaults to showing.
 
 ## `number` options
@@ -21,6 +21,8 @@ But the main draw of Power Settings is its expanded settings types and options.
 If `lowerBound` or `upperBound` are strings, they are treated as setting ID nodes, and their value is the value of the referenced setting at the time you try to change this one. If they don't start with `mod.`, then they'll be prefixed with `mod.CurrentModName.` (then you can just enter the same as `id`).
 
 If they're functions, they're called with no parameters, and the return value should be numeric.
+
+**Note:** These bounds are not enforced in the Shift+F9 editor!
 
 # Extra setting types
 
@@ -66,6 +68,19 @@ It takes the following options, in addition to global options:
   * `table`: The list of allowed entities is filtered only to entities containing all of these components.
   * `function(table):bool`: All entities are passed into this function one at a time; the entities for which the function returns true are the entities that may be selected.
 
+## `header`
+A header setting is a different color, and the player can use left/right (or their controller equivalents) to jump between multiple headers in the same screen.
+
+The setting's base type is `action`, but it does nothing.
+
+It *DOES NOT* takes the following options, despite `action` allowing them:
+
+* ~~`action`~~: This is forcibly set to `function() end`, so it can be selected but not do anything when activated.
+* ~~`leftAction`~~: This is automatically set to jump to the previous header.
+* ~~`rightAction`~~: This is automatically set to jump to the next header.
+
+Additionally, the name will automatically be bounded by `\3*cc5` and `\3r`, giving it a bright yellow color. You can override this behavior by using your own color code.
+
 ## `label`
 A label setting just inserts a dummy item with text on it.
 
@@ -74,6 +89,9 @@ The setting's base type is `action`, but it does nothing.
 It takes the following options, in addition to global options:
 
 * `large`: A boolean; if true the text will be displayed at normal size; if false or omitted, the label will be small.
+* ~~`action`~~: This is forcibly set to `function() end` so that it doesn't do anything.
+
+The text of a label is simply its `name`.
 
 ## `list`
 List settings let the player create a multi-item list. They come in multiple types and have an interface for editing the list.
@@ -85,13 +103,38 @@ In addition to the global options, a `list` setting has these:
 * `limit`: Maximum number of items in the list, defaults to `math.huge`.
 * `duplicates`: Whether or not the list allows duplicate values, defaults to `true`.
 * `itemFormat`: Format of individual items in the list view.
+* `itemDefault`: The default for newly created items.
 
 The types of list are as follows:
 
-* `string`: List entries are strings. The following options are available:
-  * `maxLength`: Inclusive upper bound for the length of each string.
+* `component`: List entries are names of components. Use the `filter` arg the same way as in a [component setting](#component).
+* `entity`: List entries are names of entities. Use the `filter` arg the same way as in an [entity setting](#entity).
+* `enum`: List entries are enums. Use the `enum` arg to specify which enum to use.
 * `number`: List entries are numeric. The following options are available:
   * `minimum`: The minimum value of each number.
   * `maximum`: The maximum value of each number.
   * `step`: The value by which the number changes with offsets.
   * `precision`: The value of which each number must be a multiple (offset by the minimum, or 0 if the minimum is nil).
+* `string`: List entries are strings. The following options are available:
+  * `maxLength`: Inclusive upper bound for the length of each string.
+
+## `multiLabel`
+A multi-label setting lets you define multiple [labels](#label) in a row using a single setting. This is good for long labels that might need translating, for example.
+
+Note that a multi-label uses non-integer order keys to maintain a consistent order without interspersing themselves between the other settings defined in the group. For example, a five-line multi-label at order=2 will use orders 2, 2.2, 2.4, 2.6, and 2.8.
+
+You can define the text of a multi-label in two ways:
+* Use a `texts` table with individual texts (not recommended for translatable multi-labels).
+* Use a `name`, which will be split at line breaks.
+
+Other than that, this setting type takes the same args as a [label setting](#label), with the following exception:
+* ~~`autoRegister`~~: This is forcibly true for multi-labels since one setting definition becomes many actual nodes. See [auto-registration](#auto-registration) for more information on what this is.
+
+# Auto-registration
+A relatively new feature of Synchrony is setting auto-registration. Using it (by putting `autoRegister = true` in your setting definition) allows you to skip defining global variables for the settings, instead accessing their values through `SettingsStorage` calls.
+
+If you're not sure what auto-registration is, that's fine - you don't need to use it. The one exception to that is multi-labels - these *must* be auto-registered because your single setting definition is actually turned into multiple definitions internally. However, you still don't need to worry about those too much because multi-labels don't produce usable values.
+
+If, however, you wish to auto-register all of your settings, well I've got some good news for you! PowerSettings includes a function to automatically auto-register all settings you define through it. Simply use `PowerSettings.autoRegister()` before any of your setting calls, and an `autoRegister = true` will be automatically injected into every setting.
+
+Need it on all but one or two? You can override this later on individual settings by adding an `autoRegister = false` to those specific settings.
