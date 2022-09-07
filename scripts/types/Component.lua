@@ -3,8 +3,10 @@ local Menu            = require "necro.menu.Menu"
 local Settings        = require "necro.config.Settings"
 local SettingsStorage = require "necro.config.SettingsStorage"
 
-local PSStorage     = require "PowerSettings.PSStorage"
 local PSEntityEvent = require "PowerSettings.PSEntityEvent"
+local PSKeyBank     = require "PowerSettings.i18n.KeyBank"
+local PSMain        = require "PowerSettings.PSMain"
+local PSStorage     = require "PowerSettings.PSStorage"
 
 local NixLib = require "NixLib.NixLib"
 
@@ -108,9 +110,20 @@ function module.setting(mode, args)
   args.editAsString = false -- forcibly false, we'll use a menu instead
   args.format = args.format or module.format
   args.components = module.getFilteredComponents(args.filter)
-  PSStorage.add("component", args)
   PSEntityEvent.addc(args)
-  return Settings[mode].string(args)
+
+  if not args.id then
+    if args.autoRegister then
+      local id = Settings[mode].string(args)
+      PSStorage.add("component", args, id)
+      return id
+    else
+      error(PSKeyBank.SettingIDError)
+    end
+  else
+    PSStorage.add("component", args, PSMain.getModSettingPrefix() .. args.id)
+    return Settings[mode].string(args)
+  end
 end
 
 return module

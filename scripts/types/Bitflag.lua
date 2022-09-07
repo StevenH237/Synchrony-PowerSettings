@@ -6,14 +6,24 @@ local SettingsStorage = require "necro.config.SettingsStorage"
 local NixLib = require "NixLib.NixLib"
 
 local EnumUtils = require "PowerSettings.EnumUtils"
+local PSKeyBank = require "PowerSettings.i18n.KeyBank"
+local PSMain    = require "PowerSettings.PSMain"
 local PSStorage = require "PowerSettings.PSStorage"
 
 local module = {}
 
-function module.format(value, presets)
+function module.format(value, args)
   local hex = bit.tohex(value, 8)
-  local n = EnumUtils.getName(presets, value)
 
+  -- Try the names table first
+  local n = args.names[value]
+  if n ~= nil then
+    if SettingsStorage.get("config.showAdvanced") then return n .. " (0x" .. hex .. ")"
+    else return n end
+  end
+
+  -- Otherwise try the preset names
+  n = EnumUtils.getName(args.presets, value)
   if n ~= nil then
     if SettingsStorage.get("config.showAdvanced") then return n .. " (0x" .. hex .. ")"
     else return n end
@@ -28,12 +38,12 @@ function module.format(value, presets)
   -- else return (#split) .. " flags (0x" .. hex .. ")" end
 end
 
-function module.getFlags(id)
+function module.getFlags(presets)
   local flags = {}
   flags.names = {}
   local unnamedFlags = {}
 
-  for k, v in pairs(flags) do
+  for k, v in pairs(presets) do
     local log2 = math.log(v) / math.log(2)
     if log2 == math.floor(log2) then
       flags[k] = v
@@ -41,8 +51,8 @@ function module.getFlags(id)
       unnamedFlags[v] = false
     else
       for i, v2 in ipairs(NixLib.bitSplit(v)) do
-        if unnamedFlags[v] == nil then
-          unnamedFlags[v] = true
+        if unnamedFlags[v2] == nil then
+          unnamedFlags[v2] = true
         end
       end
     end
@@ -79,10 +89,22 @@ function module.setting(mode, args)
   end
   args.editAsString = false -- forcibly false for bitflag settings, we'll edit as menu instead
   args.presets = args.presets or args.flags
-  args.format = args.format or function(val) return module.format(val, args.presets) end
   args.flags = module.nameFlags(args.flags or module.getFlags(args.presets))
-  PSStorage.add("bitflag", args)
-  return Settings[mode].number(args)
+  args.formatOptions = args.formatOptions or {}
+  args.format = args.format or function(val) return module.format(val, args) end
+
+  if not args.id then
+    if args.autoRegister then
+      local id = Settings[mode].number(args)
+      PSStorage.add("bitflag", args, id)
+      return id
+    else
+      error(PSKeyBank.SettingIDError)
+    end
+  else
+    PSStorage.add("bitflag", args, PSMain.getModSettingPrefix() .. args.id)
+    return Settings[mode].number(args)
+  end
 end
 
 function module.action(id)

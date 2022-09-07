@@ -1,12 +1,12 @@
-Power Settings supports settings in the `shared` and `entitySchema` modes only. For settings that use only those modes, it aims to be fully backwards compatible with the built-in settings API, such that you can simply change `require "necro.config.Settings"` to `require "PowerSettings.PowerSettings"` without breaking anything. If something breaks, please open an issue!
+PowerSettings is a mod to improve your settings-creation (and players' settings-setting) experience, adding extra options and types of settings on top of the existing settings API.
 
-But the main draw of Power Settings is its expanded settings types and options.
+It tries to be fully backwards compatible, such that you can simply change `require "necro.config.Settings"` to `require "PowerSettings.PowerSettings"`, but there are [some limitations](#limitations-on-backwards-compatibility) to this.
 
 # Extra setting options
 
 ## Global options
 * **`basicName`**: `string` - The name used on an option when basic settings are enabled.
-* **`ignoredIf`**: `bool` or `function` - The condition under which a setting should be ignored (`PowerSettings.get()` returns default value). If not specified, the setting is never ignored.
+* **`ignoredIf`**: `bool` or `function` - The condition under which a setting should be ignored (`PowerSettings.get()` returns default value). If not specified, the setting is never ignored. *Note: Ignoring a setting **only** applies to `PowerSettings.get()`!*
 * **`ignoredIsNil`**: `bool` - If true, returns `nil` instead of the default value when the setting is ignored.
 * **`ignoredValue`**: `any` - If not nil, this value is returned instead of the default value when the setting is ignored.
 * **`refreshOnChange`**: `bool` - If true, changing the value causes a `Menu.update()`. *This doesn't seem to be working in recent Synchrony versions.*
@@ -24,23 +24,15 @@ If they're functions, they're called with no parameters, and the return value sh
 
 **Note:** These bounds are not enforced in the Shift+F9 editor!
 
+## `action` options
+* **`leftAction`**: `function` - Action to perform when pressing the leftward button (usually left arrow)
+* **`rightAction`**: `function` - Action to perform when pressing the rightward button (usually right arrow)
+* **`specialAction`**: `function` - Action to perform when pressing the special button (usually tab)
+
 # Extra setting types
 
 ## `bitflag`
-The bitflag setting lets the player set the individual bits of an integer when using advanced options.
-
-The setting's base type is `number`. 
-
-It takes the following options, in addition to global options:
-
-* `flags`¹: This should be a bitmask enum, or a table with values that are powers of 2 (optionally with a `names` or `prettyNames` sub-table).
-* `presets`¹: This should be either an enum or a table with numeric values (optionally with a `names` or `prettyNames` sub-table).
-* ~~`editAsString`~~: Bitflags *cannot* be edited as string, and this option is forcibly set to `false`.
-* ~~`maximum`~~: Bitflags' maximum values are the highest value you can create with the provided flags or presets.
-* ~~`minimum`~~: Bitflags' minimum values are the lowest value you can create with the provided flags or presets (either 0 or -2147483648).
-* ~~`step`~~: Bitflags' step values should always be 1. However, not all values are accessible with the arrow keys.
-
-¹ Either `flags` or `presets` is required.
+Bitflag settings now have [their own documentation page](bitflag.md)!
 
 ## `component`
 The component setting lets the player select a component from a limited subset of components.
@@ -138,3 +130,9 @@ If you're not sure what auto-registration is, that's fine - you don't need to us
 If, however, you wish to auto-register all of your settings, well I've got some good news for you! PowerSettings includes a function to automatically auto-register all settings you define through it. Simply use `PowerSettings.autoRegister()` before any of your setting calls, and an `autoRegister = true` will be automatically injected into every setting.
 
 Need it on all but one or two? You can override this later on individual settings by adding an `autoRegister = false` to those specific settings.
+
+# Limitations on backwards compatibility
+There are a few limits on the backwards compatibility provided by PowerSettings. If something not listed below breaks, please [open an issue](https://github.com/StevenH237/Synchrony-PowerSettings/issues)!
+
+* PowerSettings doesn't have support for `user` or `overridable` settings. This is something I'm open to changing, but may require a bit of internal rewriting to achieve.
+* Setting nodes *must* have an `id` or be `autoRegister`ed. The latter isn't particularly recommended without the former, even with the vanilla settings API. However, where using neither would be valid for vanilla Settings, it's not valid for PowerSettings.

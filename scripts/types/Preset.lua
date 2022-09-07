@@ -1,6 +1,8 @@
 local Settings        = require "necro.config.Settings"
 local SettingsStorage = require "necro.config.SettingsStorage"
 
+local PSKeyBank = require "PowerSettings.i18n.KeyBank"
+local PSMain    = require "PowerSettings.PSMain"
 local PSStorage = require "PowerSettings.PSStorage"
 
 local module = {}
@@ -16,8 +18,19 @@ function module.action(set, unset)
   end
 end
 
-function module.setting(sType, args)
+function module.setting(mode, args)
   args.action = module.action(args.values, args.removeValues)
-  PSStorage.add("preset", args)
-  return Settings[sType].action(args)
+
+  if not args.id then
+    if args.autoRegister then
+      local id = Settings[mode].action(args)
+      PSStorage.add("preset", args, id)
+      return id
+    else
+      error(PSKeyBank.SettingIDError)
+    end
+  else
+    PSStorage.add("preset", args, PSMain.getModSettingPrefix() .. args.id)
+    return Settings[mode].action(args)
+  end
 end

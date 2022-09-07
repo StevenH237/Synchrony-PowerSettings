@@ -106,7 +106,7 @@ Event.menu.override("settings", 1, function(func, ev)
     -- Setting type "bitflag"
     if node.sType == "bitflag" then
       v.action = function()
-        if SettingsStorage.get("config.showAdvanced") then
+        if SettingsStorage.get("config.showAdvanced") or data.editAsFlags then
           PSBitflag.action(v.id)
         else
           PSBitflag.rightAction(v.id)

@@ -3,6 +3,7 @@ local SettingsStorage = require "necro.config.SettingsStorage"
 
 local NixLib = require "NixLib.NixLib"
 
+local PSKeyBank     = require "PowerSettings.i18n.KeyBank"
 local PSMain        = require "PowerSettings.PSMain"
 local PSStorage     = require "PowerSettings.PSStorage"
 local PSTBitflag    = require "PowerSettings.types.Bitflag"
@@ -27,8 +28,19 @@ local function defaultSetting(mode, sType, args)
   if sType == "action" and args.action == nil then
     args.action = function() end
   end
-  PSStorage.add(sType, args)
-  return Settings[mode][sType](args)
+
+  if not args.id then
+    if args.autoRegister then
+      local id = Settings[mode][sType](args)
+      PSStorage.add(sType, args, id)
+      return id
+    else
+      error(PSKeyBank.SettingIDError)
+    end
+  else
+    PSStorage.add(sType, args, PSMain.getModSettingPrefix() .. args.id)
+    return Settings[mode][sType](args)
+  end
 end
 
 for _, v in ipairs({ "shared", "entitySchema" }) do
@@ -56,8 +68,19 @@ end
 
 function module.group(args)
   autoRegister(args)
-  PSStorage.add("group", args)
-  return Settings.group(args)
+
+  if not args.id then
+    if args.autoRegister then
+      local id = Settings.group(args)
+      PSStorage.add("group", args, id)
+      return id
+    else
+      error(PSKeyBank.SettingIDError)
+    end
+  else
+    PSStorage.add("group", args, PSMain.getModSettingPrefix() .. args.id)
+    return Settings.group(args)
+  end
 end
 
 function module.reset(prefix)

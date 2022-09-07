@@ -4,8 +4,8 @@ local module = {}
 
 local storedSettings = {}
 
-function module.add(sType, data)
-  storedSettings["mod." .. PSMain.getCallingMod() .. "." .. data.id] = {sType=sType, data=data}
+function module.add(sType, data, id)
+  storedSettings[id] = { sType = sType, data = data }
 end
 
 function module.contains(id)

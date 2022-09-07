@@ -6,6 +6,8 @@ local Utilities       = require "system.utils.Utilities"
 local PSComponent   = require "PowerSettings.types.Component"
 local PSEntity      = require "PowerSettings.types.Entity"
 local PSEntityEvent = require "PowerSettings.PSEntityEvent"
+local PSKeyBank     = require "PowerSettings.i18n.KeyBank"
+local PSMain        = require "PowerSettings.PSMain"
 local PSStorage     = require "PowerSettings.PSStorage"
 
 local module = {}
@@ -50,8 +52,19 @@ function module.setting(mode, itemType, args)
     PSEntityEvent.addc(args)
   end
 
-  PSStorage.add("list." .. itemType, args)
-  return Settings[mode].string(args)
+  -- TODO see if table type setting works here?
+  if not args.id then
+    if args.autoRegister then
+      local id = Settings[mode].string(args)
+      PSStorage.add("list." .. itemType, args, id)
+      return id
+    else
+      error(PSKeyBank.SettingIDError)
+    end
+  else
+    PSStorage.add("list." .. itemType, args, PSMain.getModSettingPrefix() .. args.id)
+    return Settings[mode].string(args)
+  end
 end
 
 module.Mode = {

@@ -7,6 +7,10 @@ function module.getCallingMod()
   return modName:sub(1, modName:find(".", 1, true) - 1)
 end
 
+function module.getModSettingPrefix()
+  return "mod." .. module.getCallingMod() .. "."
+end
+
 function module.setAutoRegister(mode)
   local modName = module.getCallingMod()
   autoRegisters[modName] = mode
