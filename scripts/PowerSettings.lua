@@ -3,7 +3,8 @@ local SettingsStorage = require "necro.config.SettingsStorage"
 
 local NixLib = require "NixLib.NixLib"
 
-local PSKeyBank     = require "PowerSettings.i18n.KeyBank"
+local Text = require "PowerSettings.i18n.Text"
+
 local PSMain        = require "PowerSettings.PSMain"
 local PSStorage     = require "PowerSettings.PSStorage"
 local PSTBitflag    = require "PowerSettings.types.Bitflag"
@@ -35,7 +36,7 @@ local function defaultSetting(mode, sType, args)
       PSStorage.add(sType, args, id)
       return id
     else
-      error(PSKeyBank.SettingIDError)
+      error(Text.Errors.SettingID)
     end
   else
     PSStorage.add(sType, args, PSMain.getModSettingPrefix() .. args.id)
@@ -75,7 +76,7 @@ function module.group(args)
       PSStorage.add("group", args, id)
       return id
     else
-      error(PSKeyBank.SettingIDError)
+      error(Text.Errors.SettingID)
     end
   else
     PSStorage.add("group", args, PSMain.getModSettingPrefix() .. args.id)

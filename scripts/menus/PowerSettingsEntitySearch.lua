@@ -1,9 +1,10 @@
-local Event = require "necro.event.Event"
-local Menu  = require "necro.menu.Menu"
+local Controls = require "necro.config.Controls"
+local Event    = require "necro.event.Event"
+local Menu     = require "necro.menu.Menu"
 
-local KeyBank = require "PowerSettings.i18n.KeyBank"
+local Text = require "PowerSettings.i18n.Text"
 
-local NKeyBank = require "NixLib.i18n.KeyBank"
+local NLText = require "NixLib.i18n.Text"
 
 local function resultAction(value, callback)
   Menu.close()
@@ -26,7 +27,7 @@ Event.menu.add("menuEntitySearch", "PowerSettings_entitySearch", function(ev)
 
   if ev.searchText == nil then
     table.insert(entries, 1, {
-      label = KeyBank.SearchHint,
+      label = Text.SearchHint(Controls.getFriendlyMiscKeyBind(Controls.Misc.SEARCH)),
       font = {
         fillColor = -1,
         font = "gfx/necro/font/necrosans-6.png;",
@@ -45,7 +46,7 @@ Event.menu.add("menuEntitySearch", "PowerSettings_entitySearch", function(ev)
 
     entries[#entries + 1] = {
       id = "cancel",
-      label = NKeyBank.Cancel,
+      label = NLText.Cancel,
       action = Menu.close
     }
   end
@@ -53,7 +54,7 @@ Event.menu.add("menuEntitySearch", "PowerSettings_entitySearch", function(ev)
   menu.entries = entries
   menu.searchable = true
 
-  menu.label = "Select entity"
+  menu.label = Text.SelectEntity
 
   ev.menu = menu
 end)

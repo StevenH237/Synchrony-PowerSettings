@@ -3,20 +3,21 @@ local Settings        = require "necro.config.Settings"
 local SettingsStorage = require "necro.config.SettingsStorage"
 local Utilities       = require "system.utils.Utilities"
 
+local Text = require "PowerSettings.i18n.Text"
+
 local PSComponent   = require "PowerSettings.types.Component"
 local PSEntity      = require "PowerSettings.types.Entity"
 local PSEntityEvent = require "PowerSettings.PSEntityEvent"
-local PSKeyBank     = require "PowerSettings.i18n.KeyBank"
 local PSMain        = require "PowerSettings.PSMain"
 local PSStorage     = require "PowerSettings.PSStorage"
 
 local module = {}
 
 local function defaultListFormat(itemFormat, list)
-  if #list == 0 then return L("Empty", "emptyList")
+  if #list == 0 then return Text.Format.List0
   elseif #list == 1 then return string.format("{%s}", itemFormat(list[1]))
-  elseif #list == 2 then return L("2 items", "twoItemList")
-  else return L.formatKey("%d items", "manyItemList", #list) end
+  elseif #list == 2 then return Text.Format.List2
+  else return Text.Format.ListPlus(#list) end
 end
 
 function module.action(id)
@@ -59,7 +60,7 @@ function module.setting(mode, itemType, args)
       PSStorage.add("list." .. itemType, args, id)
       return id
     else
-      error(PSKeyBank.SettingIDError)
+      error(Text.Errors.SettingID)
     end
   else
     PSStorage.add("list." .. itemType, args, PSMain.getModSettingPrefix() .. args.id)
@@ -266,7 +267,7 @@ module.entity = {
   action = function(arg)
     Menu.open("PowerSettings_entitySearch", {
       callback = function(value) arg.items[arg.selected] = value end,
-      label = L.formatKey("%s item", "listItemName", arg.node.data.name),
+      label = Text.ListItemName(arg.node.data.name),
       list = arg.node.data.entities,
       node = arg.node.data,
       query = "",
@@ -314,7 +315,7 @@ module.component = {
   action = function(arg)
     Menu.open("PowerSettings_componentSearch", {
       callback = function(value) arg.items[arg.selected] = value end,
-      label = L.formatKey("%s item", "listItemName", arg.node.data.name),
+      label = Text.ListItemName(arg.node.data.name),
       list = arg.node.data.components,
       node = arg.node.data,
       query = "",

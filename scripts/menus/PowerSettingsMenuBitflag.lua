@@ -7,7 +7,7 @@ local TextFormat      = require "necro.config.i18n.TextFormat"
 local EnumUtils = require "PowerSettings.EnumUtils"
 local PSStorage = require "PowerSettings.PSStorage"
 
-local NKeyBank = require "NixLib.i18n.KeyBank"
+local NLText = require "NixLib.i18n.Text"
 
 local function flipBit(node, ind)
   local value = SettingsStorage.get(node, Settings.Layer.REMOTE_PENDING) or SettingsStorage.getDefaultValue(node)
@@ -69,7 +69,7 @@ Event.menu.add("menuBitflag", "PowerSettings_bitflag", function(ev)
   table.insert(entries, {
     action = function() finish(data.refreshOnChange) end,
     id = "_done",
-    label = NKeyBank.Done,
+    label = NLText.Done,
     sound = "UIBack"
   })
 

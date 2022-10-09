@@ -1,12 +1,15 @@
+---@diagnostic disable: param-type-mismatch
 local Event           = require "necro.event.Event"
 local Menu            = require "necro.menu.Menu"
 local Settings        = require "necro.config.Settings"
 local SettingsStorage = require "necro.config.SettingsStorage"
 
+local Text = require "PowerSettings.i18n.Text"
+
 local PSList    = require "PowerSettings.types.List"
 local PSStorage = require "PowerSettings.PSStorage"
 
-local NKeyBank = require "NixLib.i18n.KeyBank"
+local NLText = require "NixLib.i18n.Text"
 
 --[[
   List arg parameters:
@@ -220,7 +223,7 @@ Event.menu.add("menuList", "PowerSettings_list", function(ev)
   if #items ~= node.data.limit then
     -- "Add item" entry
     entries[#entries + 1] = {
-      label = L("+ Add", "addItem"),
+      label = Text.AddListItem,
       action = function() addItem(arg, true) end,
       specialAction = function() addItem(arg, false) end,
       id = arg.id .. ".add",
@@ -232,7 +235,7 @@ Event.menu.add("menuList", "PowerSettings_list", function(ev)
   end
 
   entries[#entries + 1] = {
-    label = NKeyBank.Done,
+    label = NLText.Done,
     action = function() modify.exitAction(arg) end,
     id = arg.id .. ".done",
     downAction = function() modify.downAction(arg) end,

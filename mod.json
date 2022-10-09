@@ -1,24 +1,20 @@
 {
 	"namespace": "PowerSettings",
 	"displayName": "Power Settings",
-	"version": "2.1.0",
+	"version": "2.2.0",
 	"synchronyVersion": "3.1.0",
-	"description": "Advanced library for mod settings.",
+	"description": "Advanced library for mod settings.\n\nDocumented on GitHub: /StevenH237/Synchrony-PowerSettings",
 	"author": "Nixill",
-	"dependencies": {
-		"NixLib_io_2237103": "2.0.1"
-	},
-	"api": {
-		"scriptPath": "scripts"
-	},
+	"dependencies": {"NixLib_io_2237103":"2.0.2"},
+	"api": {"scriptPath":"scripts"},
 	"icon": "PowerSettingsIcon.png",
 	"banner": "PowerSettingsBanner.png",
 	"tags": [],
 	"name": "PowerSettings_io_2237104",
-	"changelog": "Dependency update",
+	"changelog": "Major overhaul to text pooling\nAll human-facing text is now in PowerSettings.i18n.Text",
 	"homepageURL": "https://mod.io/g/crypt/m/PowerSettings",
 	"modioID": "2237104",
 	"modioUserID": 12939888,
-	"pendingVersion": "2.0.2",
+	"pendingVersion": "2.2.0",
 	"visibility": 0
 }

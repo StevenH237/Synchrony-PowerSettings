@@ -5,8 +5,9 @@ local SettingsStorage = require "necro.config.SettingsStorage"
 
 local NixLib = require "NixLib.NixLib"
 
+local Text = require "PowerSettings.i18n.Text"
+
 local EnumUtils = require "PowerSettings.EnumUtils"
-local PSKeyBank = require "PowerSettings.i18n.KeyBank"
 local PSMain    = require "PowerSettings.PSMain"
 local PSStorage = require "PowerSettings.PSStorage"
 
@@ -16,10 +17,13 @@ function module.format(value, args)
   local hex = bit.tohex(value, 8)
 
   -- Try the names table first
-  local n = args.names[value]
-  if n ~= nil then
-    if SettingsStorage.get("config.showAdvanced") then return n .. " (0x" .. hex .. ")"
-    else return n end
+  local n
+  if args.names then
+    n = args.names[value]
+    if n ~= nil then
+      if SettingsStorage.get("config.showAdvanced") then return n .. " (0x" .. hex .. ")"
+      else return n end
+    end
   end
 
   -- Otherwise try the preset names
@@ -31,10 +35,10 @@ function module.format(value, args)
 
   local split = NixLib.bitSplit(value)
 
-  if #split == 0 then return L("No flags enabled", "formatNoFlags")
-  elseif #split == 1 then return L.formatKey("1 flag (%s)", "formatOneFlag", "0x" .. hex)
-  elseif #split == 2 then return L.formatKey("2 flags (%s)", "formatTwoFlags", "0x" .. hex)
-  else return L.formatKey("%i flags (%s)", "formatManyFlags", #split, "0x" .. hex) end
+  if #split == 0 then return Text.Format.Bitflag0
+  elseif #split == 1 then return Text.Format.Bitflag1("0x" .. hex)
+  elseif #split == 2 then return Text.Format.Bitflag2("0x" .. hex)
+  else return Text.Format.BitflagPlus(#split, "0x" .. hex) end
   -- else return (#split) .. " flags (0x" .. hex .. ")" end
 end
 
@@ -62,8 +66,8 @@ function module.getFlags(presets)
     if v then
       local hex = bit.tohex(k, 8)
       hex = hex:sub(hex:find("[123456789abcdef]", 1, false), -1)
-      flags[L.formatKey("Unnamed bit %s", "unnamedBitDetail", "0x" .. hex)] = k
-      flags.names[k] = L("Unnamed bit", "unnamedBit")
+      flags[Text.BitflagUnnamedDetail("0x" .. hex)] = k
+      flags.names[k] = Text.BitflagUnnamed
     end
   end
 
@@ -85,7 +89,7 @@ end
 
 function module.setting(mode, args)
   if args.presets == nil and args.flags == nil then
-    error("Bitflag settings must specify flags or presets (preferably both).", 2)
+    error(Text.Errors.BitflagOmission, 2)
   end
   args.editAsString = false -- forcibly false for bitflag settings, we'll edit as menu instead
   args.presets = args.presets or args.flags
@@ -99,7 +103,7 @@ function module.setting(mode, args)
       PSStorage.add("bitflag", args, id)
       return id
     else
-      error(PSKeyBank.SettingIDError)
+      error(Text.Errors.SettingID)
     end
   else
     PSStorage.add("bitflag", args, PSMain.getModSettingPrefix() .. args.id)

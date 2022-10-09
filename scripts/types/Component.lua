@@ -3,8 +3,9 @@ local Menu            = require "necro.menu.Menu"
 local Settings        = require "necro.config.Settings"
 local SettingsStorage = require "necro.config.SettingsStorage"
 
+local Text = require "PowerSettings.i18n.Text"
+
 local PSEntityEvent = require "PowerSettings.PSEntityEvent"
-local PSKeyBank     = require "PowerSettings.i18n.KeyBank"
 local PSMain        = require "PowerSettings.PSMain"
 local PSStorage     = require "PowerSettings.PSStorage"
 
@@ -18,7 +19,7 @@ function module.format(value)
   if component then
     return value
   else
-    return L.formatKey("(No such component: %s)", "noSuchComponent", value)
+    return Text.Format.NoSuchComponent(value)
   end
 end
 
@@ -118,7 +119,7 @@ function module.setting(mode, args)
       PSStorage.add("component", args, id)
       return id
     else
-      error(PSKeyBank.SettingIDError)
+      error(Text.Errors.SettingID)
     end
   else
     PSStorage.add("component", args, PSMain.getModSettingPrefix() .. args.id)

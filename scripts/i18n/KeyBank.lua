@@ -1,3 +1,4 @@
+-- This exists for backwards compatibility! Do not use!
 local Controls = require "necro.config.Controls"
 
 local module = {}

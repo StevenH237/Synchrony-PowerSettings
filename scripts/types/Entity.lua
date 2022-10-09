@@ -3,8 +3,9 @@ local Menu            = require "necro.menu.Menu"
 local Settings        = require "necro.config.Settings"
 local SettingsStorage = require "necro.config.SettingsStorage"
 
+local Text = require "PowerSettings.i18n.Text"
+
 local PSEntityEvent = require "PowerSettings.PSEntityEvent"
-local PSKeyBank     = require "PowerSettings.i18n.KeyBank"
 local PSMain        = require "PowerSettings.PSMain"
 local PSStorage     = require "PowerSettings.PSStorage"
 
@@ -16,7 +17,7 @@ function module.format(value)
   if entity then
     if entity.friendlyName then
       if SettingsStorage.get("config.showAdvanced") then
-        return entity.friendlyName.name .. " (" .. value .. ")"
+        return Text.Format.Entity(entity.friendlyName.name, value)
       else
         return entity.friendlyName.name
       end
@@ -24,7 +25,7 @@ function module.format(value)
       return value
     end
   else
-    return L.formatKey("(No such entity: %s)", "noSuchEntity", value)
+    return Text.Format.NoSuchEntity(value)
   end
 end
 
@@ -114,7 +115,7 @@ function module.setting(mode, args)
       PSStorage.add("entity", args, id)
       return id
     else
-      error(PSKeyBank.SettingIDError)
+      error(Text.Errors.SettingID)
     end
   else
     PSStorage.add("entity", args, PSMain.getModSettingPrefix() .. args.id)

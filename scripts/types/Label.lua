@@ -1,6 +1,7 @@
 local Settings = require "necro.config.Settings"
 
-local PSKeyBank = require "PowerSettings.i18n.KeyBank"
+local Text = require "PowerSettings.i18n.Text"
+
 local PSMain    = require "PowerSettings.PSMain"
 local PSStorage = require "PowerSettings.PSStorage"
 
@@ -16,7 +17,7 @@ function module.setting(mode, args)
       PSStorage.add("label", args, id)
       return id
     else
-      error(PSKeyBank.SettingIDError)
+      error(Text.Errors.SettingID)
     end
   else
     PSStorage.add("label", args, PSMain.getModSettingPrefix() .. args.id)
