@@ -17,7 +17,14 @@ function module.getName(table, value)
   return nil
 end
 
-function module.hasNames(table, value)
+function module.hasNames(table)
+  local hasData, data = pcall(function(e) return e.data end, table)
+  if hasData and data then
+    for i, v in ipairs(data) do
+      if data.name then return true end
+    end
+  end
+
   local hasNames, names = pcall(function(e) return e.names end, table)
 
   if hasNames == false then return nil end

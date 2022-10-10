@@ -1,7 +1,9 @@
+local Color           = require "system.utils.Color"
 local Event           = require "necro.event.Event"
 local Menu            = require "necro.menu.Menu"
 local Settings        = require "necro.config.Settings"
 local SettingsStorage = require "necro.config.SettingsStorage"
+local TextFormat      = require "necro.config.i18n.TextFormat"
 local Utilities       = require "system.utils.Utilities"
 
 local PowerSettings = require "PowerSettings.PowerSettings"
@@ -164,6 +166,8 @@ Event.menu.override("settings", 1, function(func, ev)
       v.action = function() end
 
       v.func = getSelectFunction(v.id)
+
+      v.label = TextFormat.color(data.name, Color.rgb(0xcc, 0xcc, 0x55))
 
       if firstHeader == nil then
         firstHeader = v
