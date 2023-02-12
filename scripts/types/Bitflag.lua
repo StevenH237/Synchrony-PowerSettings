@@ -1,11 +1,10 @@
-local Enum            = require "system.utils.Enum"
 local Menu            = require "necro.menu.Menu"
 local Settings        = require "necro.config.Settings"
 local SettingsStorage = require "necro.config.SettingsStorage"
 
-local NixLib = require "NixLib.NixLib"
-
 local Text = require "PowerSettings.i18n.Text"
+
+local NixLib = require "NixLib.NixLib"
 
 local EnumUtils = require "PowerSettings.EnumUtils"
 local PSMain    = require "PowerSettings.PSMain"
@@ -96,10 +95,11 @@ function module.setting(mode, args)
   args.flags = module.nameFlags(args.flags or module.getFlags(args.presets))
   args.formatOptions = args.formatOptions or {}
   args.format = args.format or function(val) return module.format(val, args) end
+  args.visibility = args.visibility or Settings.Visibility.VISIBLE
 
   if not args.id then
     if args.autoRegister then
-      local id = Settings[mode].number(args)
+      local id = Settings[mode].table(args)
       PSStorage.add("bitflag", args, id)
       return id
     else
@@ -107,24 +107,71 @@ function module.setting(mode, args)
     end
   else
     PSStorage.add("bitflag", args, PSMain.getModSettingPrefix() .. args.id)
-    return Settings[mode].number(args)
+    return Settings[mode].table(args)
   end
 end
 
 function module.action(id)
-  -- Opens the bitflag selectors
-  Menu.open("PowerSettings_bitflag", id)
+  -- Populate the preset dropdown
+  local data = PSStorage.get(id).data
+  local entries = {}
+  local values = {}
+
+  for k, v in pairs(data.presets) do
+    values[v] = true
+    table.insert(entries, {
+      id = v,
+      label = module.format(v, data),
+      settingsValue = v
+    })
+  end
+
+  local current = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.getDefaultValue(id)
+
+  if not values[current] then
+    table.insert(entries, {
+      id = current,
+      label = module.format(current, data),
+      settingsValue = current
+    })
+  end
+
+  NixLib.sortBy(entries, "settingsValue")
+
+  if SettingsStorage.get("config.showAdvanced") or data.editAsFlags then
+    table.insert(entries, {
+      id = "_custom",
+      label = "Set custom value...",
+      settingsValue = "_custom"
+    })
+  end
+
+  -- Opens the preset dropdown
+  Menu.open("dropdown", {
+    entries = entries,
+    selection = current,
+    callback = function(val)
+      if type(val) == "number" then
+        SettingsStorage.set(id, val, Settings.Layer.REMOTE_PENDING)
+      else
+        -- Opens the bitflag selectors
+        Menu.open("PowerSettings_bitflag", id)
+      end
+    end
+  })
 end
 
 function module.leftAction(id)
   -- Sets the setting to the highest preset lower than its current value, or the highest preset altogether if no lower preset exists.
-  local node = PSStorage.get(id, Settings.Layer.REMOTE_PENDING)
+  local node = PSStorage.get(id)
   local presets = node.data.presets
   local A = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.getDefaultValue(id)
   local B = nil
 
   for k, C in pairs(presets) do
-    if B == nil or (B < A and C < A and C > B) or (B >= A and (C > B or C < A))
+    if B == nil
+        or (B < A and C < A and C > B) -- next(B) < this(C) < curr(A)
+        or (B >= A and (C > B or C < A)) -- curr(A) <= next(B); with this(C) outside
     then
       B = C
     end
@@ -135,7 +182,7 @@ end
 
 function module.rightAction(id)
   -- Sets the setting to the lowest preset higher than its current value, or the lowest preset altogether if no higher preset exists.
-  local node = PSStorage.get(id, Settings.Layer.REMOTE_PENDING)
+  local node = PSStorage.get(id)
   local presets = node.data.presets
   local A = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.getDefaultValue(id)
   local B = nil
