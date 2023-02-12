@@ -4,6 +4,7 @@ local module = {
   AddListItem = L("+ Add", "addListItem"),
   BitflagUnnamedDetail = function(...) return L.formatKey("Unnamed bit %s", "bitflagUnnamedDetail") end,
   BitflagUnnamed = L("Unnamed bit", "bitflagUnnamed"),
+  CancelMove = L("Cancel move", "cancelMove"),
   Errors = {
     BitflagOmission = L("Bitflag settings must specify flags or presets (preferably both).", "errors.bitflagOmission"),
     SettingID = L("Settings defined through PowerSettings must have an id (recommended) or autoRegister.",
@@ -22,6 +23,12 @@ local module = {
     NoSuchComponent = function(...) return L.formatKey("(No such component: %s)", "format.noSuchComponent", ...) end,
     NoSuchEntity = function(...) return L.formatKey("(No such entity: %s)", "format.noSuchEntity", ...) end
   },
+  List = {
+    InsertAbove = L("Insert above", "list.insertAbove"),
+    Move = L("Move...", "list.move"),
+    Remove = L("Remove", "list.remove")
+  },
+  ListIsEmpty = L("(empty)", "listIsEmpty"),
   ListItemName = function(...) return L.formatKey("%s item", "listItemName", ...) end,
   Render = {
     Add = function(...) return L.formatKey("Press '%s' to add without selecting the item.", "render.add", ...) end,

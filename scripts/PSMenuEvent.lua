@@ -107,15 +107,9 @@ Event.menu.override("settings", 1, function(func, ev)
 
     -- Setting type "bitflag"
     if node.sType == "bitflag" then
+      v.hasDropdown = true
       v.action = function()
-        if SettingsStorage.get("config.showAdvanced") or data.editAsFlags then
-          PSBitflag.action(v.id)
-        else
-          PSBitflag.rightAction(v.id)
-          if data.refreshOnChange then
-            Menu.update()
-          end
-        end
+        PSBitflag.action(v.id)
       end
       v.leftAction = function()
         PSBitflag.leftAction(v.id)
