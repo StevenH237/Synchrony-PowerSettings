@@ -24,11 +24,11 @@ local function defaultListFormat(itemFormat, list)
   else return Text.Format.ListPlus(#list) end
 end
 
-function module.action(id)
+function module.action(id, layer)
+  -- This gets the list to pass into the menu.
   Menu.open("PowerSettings_list", {
     id = id,
-    items = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or
-        Utilities.fastCopy(SettingsStorage.getDefaultValue(id)),
+    items = Utilities.fastCopy(SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.get(id)),
     mode = module.Mode.MODIFY,
     callback = function(items)
       SettingsStorage.set(id, items, Settings.Layer.REMOTE_PENDING)

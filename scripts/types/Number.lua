@@ -8,23 +8,25 @@ local PSStorage = require "PowerSettings.PSStorage"
 
 local module = {}
 
-function module.validateBounds(id)
-  local this = PSStorage.get(id)
-  local value = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.getDefaultValue(id)
+function module.validateBounds(id, layer)
+  local this = PSStorage.get(id).data
+  local value = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.get(id)
   local newValue = nil
-  local lowerBound = this.data.lowerBound
+  local lowerBound = this.lowerBound
   local lowerValue = nil
-  local upperBound = this.data.upperBound
+  local upperBound = this.upperBound
   local upperValue = nil
 
   -- Let's validate the lower bound first
   if type(lowerBound) == "string" then
     -- Strings are treated as a setting ID.
-    lowerValue = SettingsStorage.get(lowerBound, Settings.Layer.REMOTE_PENDING) or
-        SettingsStorage.getDefaultValue(lowerBound)
+    lowerValue = SettingsStorage.get(lowerBound)
   elseif type(lowerBound) == "function" then
     -- Functions are called parameterlessly.
     lowerValue = lowerBound()
+  elseif type(lowerBound) == "number" then
+    -- Just in case.
+    lowerValue = lowerBound
   end
 
   if lowerValue and value < lowerValue then
@@ -35,11 +37,13 @@ function module.validateBounds(id)
   -- Let's validate the upper bound second
   if type(upperBound) == "string" then
     -- Strings are treated as a setting ID.
-    upperValue = SettingsStorage.get(upperBound, Settings.Layer.REMOTE_PENDING) or
-        SettingsStorage.getDefaultValue(upperBound)
+    upperValue = SettingsStorage.get(upperBound)
   elseif type(upperBound) == "function" then
     -- Functions are called parameterlessly.
     upperValue = upperBound()
+  elseif type(upperBound) == "number" then
+    -- Just in case.
+    upperValue = upperBound
   end
 
   if upperValue and value > upperValue then
@@ -49,7 +53,7 @@ function module.validateBounds(id)
 
   -- If we're changing the value, then change it
   if newValue then
-    SettingsStorage.set(id, newValue, Settings.Layer.REMOTE_PENDING)
+    SettingsStorage.set(id, newValue, layer)
   end
 end
 

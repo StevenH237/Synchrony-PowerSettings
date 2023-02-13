@@ -9,14 +9,13 @@ local PSStorage = require "PowerSettings.PSStorage"
 
 local NLText = require "NixLib.i18n.Text"
 
-local function flipBit(node, ind)
-  local value = SettingsStorage.get(node, Settings.Layer.REMOTE_PENDING) or SettingsStorage.getDefaultValue(node)
-  SettingsStorage.set(node, bit.bxor(value, ind), Settings.Layer.REMOTE_PENDING)
+local function flipBit(arg, ind)
+  local value = arg.value
+  arg.value = bit.bxor(value, ind)
 end
 
-local function labelBit(node, name, ind)
+local function labelBit(value, name, ind)
   local out = name .. " "
-  local value = SettingsStorage.get(node, Settings.Layer.REMOTE_PENDING) or SettingsStorage.getDefaultValue(node)
 
   if bit.band(value, ind) ~= 0 then
     out = out .. TextFormat.Symbol.CHECKBOX_ON
@@ -27,7 +26,8 @@ local function labelBit(node, name, ind)
   return out
 end
 
-local function finish(refresh)
+local function finish(arg, refresh)
+  SettingsStorage.set(arg.id, arg.value, arg.layer)
   Menu.close()
   if refresh then
     Menu.update()
@@ -35,11 +35,19 @@ local function finish(refresh)
 end
 
 Event.menu.add("menuBitflag", "PowerSettings_bitflag", function(ev)
+  --[[ ev.arg format: 
+    {
+      id = "mod.PowerSettings.setting.node",
+      layer = Settings.Layer.SOMETHING,
+      value = 0
+    }
+  ]]
+
   ev.menu = {}
   local entries = {}
   local advanced = SettingsStorage.get("config.showAdvanced")
 
-  local data = PSStorage.get(ev.arg).data
+  local data = PSStorage.get(ev.arg.id).data
   ev.menu.label = data.name
 
   local flags = data.flags
@@ -55,11 +63,11 @@ Event.menu.add("menuBitflag", "PowerSettings_bitflag", function(ev)
     end
     local action = function() flipBit(ev.arg, v) end
     local entry = {
-      id = ev.arg .. ".bit" .. v,
+      id = ev.arg.id .. ".bit" .. v,
       leftAction = action,
       rightAction = action,
       action = action,
-      label = function() return labelBit(ev.arg, k, v) end
+      label = function() return labelBit(ev.arg.value, k, v) end
     }
     table.insert(entries, entry)
     ::nextBit::
@@ -67,12 +75,12 @@ Event.menu.add("menuBitflag", "PowerSettings_bitflag", function(ev)
 
   table.insert(entries, { height = 0 })
   table.insert(entries, {
-    action = function() finish(data.refreshOnChange) end,
+    action = function() finish(ev.arg, data.refreshOnChange) end,
     id = "_done",
     label = NLText.Done,
     sound = "UIBack"
   })
 
   ev.menu.entries = entries
-  ev.menu.escapeAction = function() finish(data.refreshOnChange) end
+  ev.menu.escapeAction = function() finish(ev.arg, data.refreshOnChange) end
 end)

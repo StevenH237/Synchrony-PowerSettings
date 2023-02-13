@@ -44,7 +44,7 @@ local function defaultSetting(mode, sType, args)
   end
 end
 
-for _, v in ipairs({ "shared", "entitySchema" }) do
+for _, v in ipairs({ "shared", "entitySchema", "user", "overridable" }) do
   module[v] = {}
   for _, t in ipairs({ "bool", "enum", "string", "table", "choice", "action" }) do
     module[v][t] = function(args) autoRegister(args) return defaultSetting(v, t, args) end
@@ -84,32 +84,51 @@ function module.group(args)
   end
 end
 
-function module.reset(prefix)
-  local keys = SettingsStorage.listKeys(prefix, Settings.Layer.REMOTE_OVERRIDE)
+function module.reset(prefix, layer)
+  local layerIn = layer or Settings.Layer.REMOTE_OVERRIDE
+  local layerOut = layerIn
+
+  if layerIn == Settings.Layer.REMOTE_OVERRIDE then
+    layerOut = Settings.Layer.REMOTE_PENDING
+  end
+
+  local keys = SettingsStorage.listKeys(prefix, layerIn)
   for _, key in ipairs(keys) do
-    SettingsStorage.set(key, nil, Settings.Layer.REMOTE_PENDING)
+    SettingsStorage.set(key, nil, layerOut)
   end
 end
 
 function module.getIgnored(data)
   if data.ignoredIsNil then
     return nil
-  elseif data.ignored ~= nil then
+  elseif data.ignoredValue ~= nil then
     return data.ignoredValue
   else
     return data.default
   end
 end
 
-function module.get(setting, layers)
-  if type(layers) == "nil" then
-    layers = {}
-  elseif type(layers) ~= "table" then
-    layers = { layers }
+local function getRawSetting(id)
+  local n = PSStorage.get(id)
+  if n then
+    local node = n.data -- This is the settings definition table, the same one actually passed to Settings.*.*
+    for i, v in ipairs(node.layers) do
+      if v == Settings.Layer.REMOTE_OVERRIDE then
+        local val = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING)
+        if val ~= nil then return val end
+      end
+      local val = SettingsStorage.get(id, v)
+      if val ~= nil then return val end
+    end
+  else
+    return SettingsStorage.get(id) -- Fallback if the setting wasn't actually defined in PowerSettings
   end
+end
+
+function module.get(setting, layers)
+  local node = PSStorage.get()
 
   -- Do we have an ignore condition?
-  local node = PSStorage.get(setting)
   if node then
     local ignoredIf = node.data.ignoredIf
     -- If it exists and is true, return the default value.
@@ -120,7 +139,15 @@ function module.get(setting, layers)
     end
   end
 
-  -- Otherwise try grabbing it by the layers.
+  if type(layers) == nil then
+    return getRawSetting(setting)
+  end
+
+  if type(layers) ~= "table" then
+    layers = { layers }
+  end
+
+  -- Try grabbing it by the layers.
   for i, layer in ipairs(layers) do
     local try = SettingsStorage.get(setting, layer)
     if try ~= nil then return try end
@@ -130,9 +157,13 @@ function module.get(setting, layers)
 end
 
 function module.getRaw(setting, layers)
-  if type(layers) == "nil" then
-    layers = {}
-  elseif type(layers) ~= "table" then
+  local node = PSStorage.get()
+
+  if type(layers) == nil then
+    return getRawSetting(setting)
+  end
+
+  if type(layers) ~= "table" then
     layers = { layers }
   end
 
@@ -153,7 +184,7 @@ end
 module.shared.group = module.group
 module.entitySchema.group = module.group
 
-for _, v in ipairs({ "Scope", "Type", "Visibility", "Tag", "Layer" }) do
+for _, v in ipairs({ "Scope", "Type", "Visibility", "Tag", "Layer", "Format" }) do
   module[v] = Settings[v]
 end
 

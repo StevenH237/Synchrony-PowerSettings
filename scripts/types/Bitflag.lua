@@ -111,7 +111,7 @@ function module.setting(mode, args)
   end
 end
 
-function module.action(id)
+function module.action(id, layer)
   -- Populate the preset dropdown
   local data = PSStorage.get(id).data
   local entries = {}
@@ -126,7 +126,7 @@ function module.action(id)
     })
   end
 
-  local current = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.getDefaultValue(id)
+  local current = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.get(id)
 
   if not values[current] then
     table.insert(entries, {
@@ -152,20 +152,24 @@ function module.action(id)
     selection = current,
     callback = function(val)
       if type(val) == "number" then
-        SettingsStorage.set(id, val, Settings.Layer.REMOTE_PENDING)
+        SettingsStorage.set(id, val, layer)
       else
         -- Opens the bitflag selectors
-        Menu.open("PowerSettings_bitflag", id)
+        Menu.open("PowerSettings_bitflag", {
+          id = id,
+          layer = layer,
+          value = current
+        })
       end
     end
   })
 end
 
-function module.leftAction(id)
+function module.leftAction(id, layer)
   -- Sets the setting to the highest preset lower than its current value, or the highest preset altogether if no lower preset exists.
   local node = PSStorage.get(id)
   local presets = node.data.presets
-  local A = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.getDefaultValue(id)
+  local A = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.get(id)
   local B = nil
 
   for k, C in pairs(presets) do
@@ -177,14 +181,14 @@ function module.leftAction(id)
     end
   end
 
-  SettingsStorage.set(id, B, Settings.Layer.REMOTE_PENDING)
+  SettingsStorage.set(id, B, layer)
 end
 
-function module.rightAction(id)
+function module.rightAction(id, layer)
   -- Sets the setting to the lowest preset higher than its current value, or the lowest preset altogether if no higher preset exists.
   local node = PSStorage.get(id)
   local presets = node.data.presets
-  local A = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.getDefaultValue(id)
+  local A = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.get(id)
   local B = nil
 
   for k, C in pairs(presets) do
@@ -194,7 +198,7 @@ function module.rightAction(id)
     end
   end
 
-  SettingsStorage.set(id, B, Settings.Layer.REMOTE_PENDING)
+  SettingsStorage.set(id, B, layer)
 end
 
 return module

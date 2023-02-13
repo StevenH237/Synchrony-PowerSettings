@@ -49,12 +49,12 @@ function module.getFilteredEntities(filter)
   return out
 end
 
-function module.action(id)
+function module.action(id, layer)
   local node = PSStorage.get(id).data
 
   Menu.open("PowerSettings_entitySearch", {
     callback = function(value)
-      SettingsStorage.set(id, value, Settings.Layer.REMOTE_PENDING)
+      SettingsStorage.set(id, value, layer)
       if node.refreshOnChange then
         Menu.update()
       end
@@ -67,10 +67,10 @@ function module.action(id)
   })
 end
 
-function module.leftAction(id)
+function module.leftAction(id, layer)
   local node = PSStorage.get(id)
   local list = node.data.entities
-  local value = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.getDefaultValue(id)
+  local value = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.get(id)
   local leftValue = nil
 
   for i, v in ipairs(list) do
@@ -83,13 +83,13 @@ function module.leftAction(id)
 
   if leftValue == nil then leftValue = "" end
 
-  SettingsStorage.set(id, leftValue, Settings.Layer.REMOTE_PENDING)
+  SettingsStorage.set(id, leftValue, layer)
 end
 
-function module.rightAction(id)
+function module.rightAction(id, layer)
   local node = PSStorage.get(id)
   local list = node.data.entities
-  local value = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.getDefaultValue(id)
+  local value = SettingsStorage.get(id, Settings.Layer.REMOTE_PENDING) or SettingsStorage.get(id)
   local useNext = nil
 
   for i, v in ipairs(list) do
@@ -100,7 +100,7 @@ function module.rightAction(id)
   if useNext == nil or useNext == true then useNext = list[1] end
   if useNext == nil then useNext = "" end
 
-  SettingsStorage.set(id, useNext, Settings.Layer.REMOTE_PENDING)
+  SettingsStorage.set(id, useNext, layer)
 end
 
 function module.setting(mode, args)

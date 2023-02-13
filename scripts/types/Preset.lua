@@ -8,14 +8,14 @@ local PSStorage = require "PowerSettings.PSStorage"
 
 local module = {}
 
-function module.action(set, unset)
+function module.action(set, unset, layer)
   for k, v in pairs(set) do
     if type(v) == "function" then v = v() end
-    SettingsStorage.set(k, v, Settings.Layer.REMOTE_PENDING)
+    SettingsStorage.set(k, v, layer)
   end
 
   for i, v in ipairs(set) do
-    SettingsStorage.set(v, nil, Settings.Layer.REMOTE_PENDING)
+    SettingsStorage.set(v, nil, layer)
   end
 end
 

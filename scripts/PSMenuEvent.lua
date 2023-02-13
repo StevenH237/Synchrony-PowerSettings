@@ -109,16 +109,16 @@ Event.menu.override("settings", 1, function(func, ev)
     if node.sType == "bitflag" then
       v.hasDropdown = true
       v.action = function()
-        PSBitflag.action(v.id)
+        PSBitflag.action(v.id, ev.arg.layer)
       end
       v.leftAction = function()
-        PSBitflag.leftAction(v.id)
+        PSBitflag.leftAction(v.id, ev.arg.layer)
         if data.refreshOnChange then
           Menu.update()
         end
       end
       v.rightAction = function()
-        PSBitflag.rightAction(v.id)
+        PSBitflag.rightAction(v.id, ev.arg.layer)
         if data.refreshOnChange then
           Menu.update()
         end
@@ -126,15 +126,15 @@ Event.menu.override("settings", 1, function(func, ev)
 
       -- Setting type "component"
     elseif node.sType == "component" then
-      v.action = function() PSComponent.action(v.id) end
+      v.action = function() PSComponent.action(v.id, ev.arg.layer) end
       v.leftAction = function()
-        PSComponent.leftAction(v.id)
+        PSComponent.leftAction(v.id, ev.arg.layer)
         if data.refreshOnChange then
           Menu.update()
         end
       end
       v.rightAction = function()
-        PSComponent.rightAction(v.id)
+        PSComponent.rightAction(v.id, ev.arg.layer)
         if data.refreshOnChange then
           Menu.update()
         end
@@ -142,15 +142,15 @@ Event.menu.override("settings", 1, function(func, ev)
 
       -- Setting type "entity"
     elseif node.sType == "entity" then
-      v.action = function() PSEntity.action(v.id) end
+      v.action = function() PSEntity.action(v.id, ev.arg.layer) end
       v.leftAction = function()
-        PSEntity.leftAction(v.id)
+        PSEntity.leftAction(v.id, ev.arg.layer)
         if data.refreshOnChange then
           Menu.update()
         end
       end
       v.rightAction = function()
-        PSEntity.rightAction(v.id)
+        PSEntity.rightAction(v.id, ev.arg.layer)
         if data.refreshOnChange then
           Menu.update()
         end
@@ -199,9 +199,7 @@ Event.menu.override("settings", 1, function(func, ev)
 
       -- Setting type "list.*"
     elseif node.sType:sub(1, 5) == "list." then
-      v.action = function() PSList.action(v.id) end
-      v.textEntry = nil
-      v.textEntryToggle = nil
+      v.action = function() PSList.action(v.id, ev.arg.layer) end
 
       -- Remaining setting types
     elseif node.sType == "group" then
@@ -213,7 +211,7 @@ Event.menu.override("settings", 1, function(func, ev)
     elseif node.sType == "number" or node.sType == "time" or node.sType == "percent" then
       -- greaterThan/lessThan parameters
       if data.lowerBound or data.upperBound then
-        addActionFunctions(v, function() PSNumber.validateBounds(v.id) end)
+        addActionFunctions(v, function() PSNumber.validateBounds(v.id, ev.arg.layer) end)
       end
 
       if data.refreshOnChange then

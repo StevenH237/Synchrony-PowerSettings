@@ -1,7 +1,7 @@
 {
 	"namespace": "PowerSettings",
 	"displayName": "Power Settings",
-	"version": "2.4.0",
+	"version": "2.5.0",
 	"synchronyVersion": "3.5.1",
 	"description": "Advanced library for mod settings.\n\nDocumented on GitHub: /StevenH237/Synchrony-PowerSettings",
 	"author": "Nixill",
@@ -11,10 +11,10 @@
 	"banner": "PowerSettingsBanner.png",
 	"tags": [],
 	"name": "PowerSettings_io_2237104",
-	"changelog": "Updates to bitflag and list settings for Synchrony mouse menu controls compat",
+	"changelog": "User and overridable settings added!",
 	"homepageURL": "https://mod.io/g/crypt/m/PowerSettings",
 	"modioID": "2237104",
 	"modioUserID": 12939888,
-	"pendingVersion": "2.4.0",
+	"pendingVersion": "2.5.0",
 	"visibility": 0
 }
