@@ -5,17 +5,18 @@ local NixLib = require "NixLib.NixLib"
 
 local Text = require "PowerSettings.i18n.Text"
 
-local PSMain        = require "PowerSettings.PSMain"
-local PSStorage     = require "PowerSettings.PSStorage"
-local PSTBitflag    = require "PowerSettings.types.Bitflag"
-local PSTComponent  = require "PowerSettings.types.Component"
-local PSTEntity     = require "PowerSettings.types.Entity"
-local PSTHeader     = require "PowerSettings.types.Header"
-local PSTLabel      = require "PowerSettings.types.Label"
-local PSTList       = require "PowerSettings.types.List"
-local PSTMultiLabel = require "PowerSettings.types.MultiLabel"
-local PSTNumber     = require "PowerSettings.types.Number"
-local PSTPreset     = require "PowerSettings.types.Preset"
+local PSMain              = require "PowerSettings.PSMain"
+local PSStorage           = require "PowerSettings.PSStorage"
+local PSSettingsSaveEvent = require "PowerSettings.event.SettingsSave"
+local PSTBitflag          = require "PowerSettings.types.Bitflag"
+local PSTComponent        = require "PowerSettings.types.Component"
+local PSTEntity           = require "PowerSettings.types.Entity"
+local PSTHeader           = require "PowerSettings.types.Header"
+local PSTLabel            = require "PowerSettings.types.Label"
+local PSTList             = require "PowerSettings.types.List"
+local PSTMultiLabel       = require "PowerSettings.types.MultiLabel"
+local PSTNumber           = require "PowerSettings.types.Number"
+local PSTPreset           = require "PowerSettings.types.Preset"
 
 local module = {}
 
@@ -180,27 +181,18 @@ function module.autoRegister()
   PSMain.setAutoRegister(true)
 end
 
+function module.saveVersionNumber()
+  PSSettingsSaveEvent.add()
+end
+
 -- Backwards compatibility with vanilla Settings
 module.shared.group = module.group
 module.entitySchema.group = module.group
+module.overridable.group = module.group
+module.user.group = module.group
 
 for _, v in ipairs({ "Scope", "Type", "Visibility", "Tag", "Layer", "Format" }) do
   module[v] = Settings[v]
 end
-
--- And explain the intentional lack of backwards compatibility:
-local moduleMeta = {}
-
-function moduleMeta.index(table, key)
-  if key == "overridable" then
-    error(L("PowerSettings does not support overridable settings (yet!). You'll need to use regular Settings for those."
-      , "overridableError"))
-  elseif key == "user" then
-    error(L("PowerSettings does not support user settings (yet!). You'll need to use regular Settings for those.",
-      "userError"))
-  end
-end
-
-setmetatable(module, moduleMeta)
 
 return module
